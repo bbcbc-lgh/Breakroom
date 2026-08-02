@@ -10,8 +10,9 @@ def test_settings_use_safe_local_defaults() -> None:
     assert settings.port == 8765
     assert settings.dialogue_mode == "mock"
     assert settings.content_path == PROJECT_ROOT / "Content" / "NPCProfiles.json"
-    assert settings.data_dir is None
-    assert settings.log_dir is None
+    assert settings.data_dir.name == "Data"
+    assert settings.log_dir.name == "Logs"
+    assert settings.database_path == settings.data_dir / "CyberTown.db"
 
 
 def test_settings_accept_explicit_content_path(tmp_path: Path) -> None:

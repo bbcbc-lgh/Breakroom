@@ -12,6 +12,6 @@ async def health(request: Request) -> HealthResponse:
         status="ready",
         version=APP_VERSION,
         dialogue_mode=request.app.state.settings.dialogue_mode,
-        database_ready=False,
+        database_ready=request.app.state.database.ready,
         content_version=request.app.state.npc_service.content_version,
     )

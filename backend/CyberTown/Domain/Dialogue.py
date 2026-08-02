@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Literal
 
 from CyberTown.Domain.NPCProfile import NPCProfile
+from CyberTown.Domain.Relationship import RelationshipDecision
 
 ReplySource = Literal["mock", "model", "fallback"]
 INTERACTION_TAGS = {
@@ -52,21 +53,13 @@ class DialogueModelResult:
 
 
 @dataclass(frozen=True, slots=True)
-class RelationshipResult:
-    score: int = 10
-    level: str = "陌生"
-    delta: int = 0
-    reason: str = "初次交流"
-
-
-@dataclass(frozen=True, slots=True)
 class DialogueResult:
     request_id: str
     client_request_id: str
     profile: NPCProfile
     reply: str
     reply_source: ReplySource
-    relationship: RelationshipResult
+    relationship: RelationshipDecision
     memory_saved: bool
     degraded: bool
     created_at: datetime

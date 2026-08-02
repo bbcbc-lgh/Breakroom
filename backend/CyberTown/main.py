@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI
 
@@ -18,8 +21,14 @@ from CyberTown.Observability.RequestContext import (
     reset_request_id,
     set_request_id,
 )
+from CyberTown.Repository.Database import Database
+from CyberTown.Repository.DialogueRepository import DialogueRepository
+from CyberTown.Repository.MemoryRepository import MemoryRepository
+from CyberTown.Repository.RelationshipRepository import RelationshipRepository
 from CyberTown.Service.DialogueService import DialogueService
+from CyberTown.Service.MemoryService import MemoryService
 from CyberTown.Service.NPCService import NPCService
+from CyberTown.Service.RelationshipService import RelationshipService
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -27,17 +36,34 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     document = NPCConfigLoader().load(app_settings.content_path)
     npc_service = NPCService(document)
     dialogue_agent = NPCDialogueAgent(MockDialogueModelClient())
+    database = Database(app_settings.database_path)
+    dialogue_repository = DialogueRepository()
+    relationship_repository = RelationshipRepository()
+    memory_service = MemoryService(MemoryRepository())
+
+    @asynccontextmanager
+    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+        await database.initialize()
+        yield
+
     app = FastAPI(
         title="赛博小镇后端服务",
         description="Cyber Town local NPC dialogue backend",
         version=APP_VERSION,
+        lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.database = database
     app.state.npc_service = npc_service
     app.state.dialogue_service = DialogueService(
+        database=database,
         npc_service=npc_service,
         context_builder=NPCContextBuilder(),
         dialogue_agent=dialogue_agent,
+        dialogue_repository=dialogue_repository,
+        relationship_repository=relationship_repository,
+        memory_service=memory_service,
+        relationship_service=RelationshipService(),
     )
 
     @app.middleware("http")
@@ -46,7 +72,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         token = set_request_id(request_id)
         try:
             response = await call_next(request)
-            response.headers["X-Request-ID"] = request_id
+            response.headers["X-Request-ID"] = getattr(
+                request.state, "response_request_id", request_id
+            )
             return response
         finally:
             reset_request_id(token)

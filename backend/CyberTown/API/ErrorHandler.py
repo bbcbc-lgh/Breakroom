@@ -39,3 +39,10 @@ def register_error_handlers(app: FastAPI) -> None:
             status_code=422,
             content=_payload("INVALID_REQUEST", "请求字段无效，请检查后重试。", False),
         )
+
+    @app.exception_handler(Exception)
+    async def handle_unexpected_error(_request: Request, _exc: Exception) -> JSONResponse:
+        return JSONResponse(
+            status_code=500,
+            content=_payload("INTERNAL_ERROR", "服务暂时无法完成请求，请稍后重试。", True),
+        )

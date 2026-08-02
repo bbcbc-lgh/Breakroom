@@ -1,5 +1,7 @@
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from uuid import uuid4
 
 import httpx
@@ -10,10 +12,12 @@ from CyberTown.main import create_app
 
 @asynccontextmanager
 async def _client() -> AsyncIterator[httpx.AsyncClient]:
-    app = create_app(Settings(dialogue_mode="mock"))
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
-        yield client
+    with TemporaryDirectory() as temp_dir:
+        app = create_app(Settings(dialogue_mode="mock", data_dir=Path(temp_dir)))
+        async with app.router.lifespan_context(app):
+            transport = httpx.ASGITransport(app=app)
+            async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+                yield client
 
 
 def _dialogue_payload(npc_id: str, message: str = "请给我一个建议") -> dict:
@@ -34,7 +38,7 @@ async def test_health_reports_mock_mode_and_content_version() -> None:
         "status": "ready",
         "version": "0.1.0",
         "dialogue_mode": "mock",
-        "database_ready": False,
+        "database_ready": True,
         "content_version": "1",
     }
     assert response.headers["X-Request-ID"]
@@ -81,10 +85,10 @@ async def test_dialogue_response_matches_public_contract() -> None:
     assert payload["npc"]["name"] == "张旭"
     assert payload["reply_source"] == "mock"
     assert payload["relationship"] == {
-        "score": 10,
+        "score": 13,
         "level": "陌生",
-        "delta": 0,
-        "reason": "初次交流",
+        "delta": 3,
+        "reason": "认真交流",
     }
     assert payload["memory_saved"] is False
     assert payload["degraded"] is False

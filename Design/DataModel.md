@@ -80,7 +80,12 @@ SQLite 保存玩家-NPC 对话、关系和长期记忆。NPC 人设本身不写�
 | `delta` | INTEGER | NOT NULL |
 | `new_score` | INTEGER | NOT NULL |
 | `reason` | TEXT | NOT NULL |
+| `interaction_count` | INTEGER | NOT NULL，当次结果快照 |
+| `positive_points_today` | INTEGER | NOT NULL，当次结果快照 |
+| `positive_points_date` | TEXT | NOT NULL，当次结果快照 |
 | `created_at` | TEXT | NOT NULL |
+
+关系事件保留当次结果快照，以便相同 `client_request_id` 重放时返回首次响应，而不是拼接当前关系状态。
 
 ### `memory_events`
 

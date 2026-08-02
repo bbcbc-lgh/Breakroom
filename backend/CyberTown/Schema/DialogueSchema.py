@@ -45,3 +45,17 @@ class DialogueResponse(BaseModel):
     memory_saved: bool
     degraded: bool
     created_at: datetime
+
+
+class ConversationMessageResponse(BaseModel):
+    message_id: str
+    role: Literal["player", "npc"]
+    content: str
+    created_at: datetime
+    reply_source: Literal["mock", "model", "fallback"] | None = None
+
+
+class ConversationResponse(BaseModel):
+    npc: DialogueNPCResponse
+    relationship: RelationshipResponse
+    messages: list[ConversationMessageResponse]
