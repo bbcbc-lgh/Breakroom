@@ -51,8 +51,13 @@ class MemoryService:
         for memory in candidates:
             memory_terms = set(memory.terms)
             overlap = query_terms & memory_terms
+            contains_term = any(
+                term in _normalize(query) for term in memory.terms if len(term) > 1
+            )
+            if not overlap and not contains_term:
+                continue
             score = len(overlap) * 2 + memory.importance
-            if any(term in _normalize(query) for term in memory.terms if len(term) > 1):
+            if contains_term:
                 score += 3
             if _as_utc(memory.created_at) >= now - timedelta(days=30):
                 score += 1

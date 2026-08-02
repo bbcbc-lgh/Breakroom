@@ -130,6 +130,7 @@ class DialogueService:
                             player_id=player_id,
                             npc_id=npc_id,
                             npc_name=profile.name,
+                            npc_title=profile.title,
                             player_message=message,
                             model_result=model_result,
                             relationship=decision,
@@ -200,7 +201,12 @@ class DialogueService:
         return DialogueResult(
             request_id=stored.request_id,
             client_request_id=stored.client_request_id,
-            profile=profile,
+            profile=profile.model_copy(
+                update={
+                    "name": stored.npc_name,
+                    "title": stored.npc_title or profile.title,
+                }
+            ),
             reply=stored.npc_reply,
             reply_source=stored.reply_source,
             relationship=stored.relationship,

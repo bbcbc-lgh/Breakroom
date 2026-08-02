@@ -42,6 +42,7 @@ SQLite 保存玩家-NPC 对话、关系和长期记忆。NPC 人设本身不写�
 | `player_id` | TEXT | NOT NULL, FK players |
 | `npc_id` | TEXT | NOT NULL |
 | `npc_name_snapshot` | TEXT | NOT NULL |
+| `npc_title_snapshot` | TEXT | NOT NULL |
 | `player_message` | TEXT | NOT NULL |
 | `npc_reply` | TEXT | NOT NULL |
 | `reply_source` | TEXT | CHECK mock/model/fallback |

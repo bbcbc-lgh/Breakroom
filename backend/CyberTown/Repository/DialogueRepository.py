@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 import aiosqlite
 
@@ -18,6 +18,8 @@ class StoredTurn:
     request_fingerprint: str
     player_id: str
     npc_id: str
+    npc_name: str
+    npc_title: str
     player_message: str
     npc_reply: str
     reply_source: str
@@ -72,6 +74,7 @@ class DialogueRepository:
         player_id: str,
         npc_id: str,
         npc_name: str,
+        npc_title: str,
         player_message: str,
         model_result: DialogueModelResult,
         relationship: RelationshipDecision,
@@ -82,10 +85,11 @@ class DialogueRepository:
             """
             INSERT INTO dialogue_turns(
                 turn_id, request_id, client_request_id, request_fingerprint,
-                player_id, npc_id, npc_name_snapshot, player_message, npc_reply,
+                player_id, npc_id, npc_name_snapshot, npc_title_snapshot,
+                player_message, npc_reply,
                 reply_source, interaction_tags_json, relationship_delta,
                 relationship_reason, memory_saved, created_at
-            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 turn_id,
@@ -95,6 +99,7 @@ class DialogueRepository:
                 player_id,
                 npc_id,
                 npc_name,
+                npc_title,
                 player_message,
                 model_result.reply,
                 model_result.reply_source,
@@ -114,17 +119,31 @@ class DialogueRepository:
         *,
         turn_limit: int = 5,
     ) -> tuple[ConversationMessage, ...]:
+        cutoff = (datetime.now(UTC) - timedelta(minutes=120)).isoformat()
         cursor = await connection.execute(
             """
             SELECT player_message, npc_reply
             FROM dialogue_turns
-            WHERE player_id = ? AND npc_id = ?
+            WHERE player_id = ? AND npc_id = ? AND created_at >= ?
             ORDER BY created_at DESC
             LIMIT ?
             """,
-            (player_id, npc_id, turn_limit),
+            (player_id, npc_id, cutoff, turn_limit),
         )
-        rows = list(reversed(await cursor.fetchall()))
+        rows = await cursor.fetchall()
+        if not rows:
+            cursor = await connection.execute(
+                """
+                SELECT player_message, npc_reply
+                FROM dialogue_turns
+                WHERE player_id = ? AND npc_id = ?
+                ORDER BY created_at DESC
+                LIMIT 1
+                """,
+                (player_id, npc_id),
+            )
+            rows = await cursor.fetchall()
+        rows = list(reversed(rows))
         messages: list[ConversationMessage] = []
         for row in rows:
             messages.append(ConversationMessage(role="player", content=row["player_message"]))
@@ -175,6 +194,8 @@ class DialogueRepository:
             request_fingerprint=row["request_fingerprint"],
             player_id=row["player_id"],
             npc_id=row["npc_id"],
+            npc_name=row["npc_name_snapshot"],
+            npc_title=row["npc_title_snapshot"],
             player_message=row["player_message"],
             npc_reply=row["npc_reply"],
             reply_source=row["reply_source"],

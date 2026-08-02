@@ -16,9 +16,9 @@ class PublicError(Exception):
         self.retryable = retryable
 
 
-def _payload(code: str, message: str, retryable: bool) -> dict:
+def _payload(code: str, message: str, retryable: bool, request_id: str | None = None) -> dict:
     return {
-        "request_id": get_request_id(),
+        "request_id": request_id or get_request_id(),
         "error": {"code": code, "message": message, "retryable": retryable},
     }
 
@@ -41,8 +41,13 @@ def register_error_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def handle_unexpected_error(_request: Request, _exc: Exception) -> JSONResponse:
-        return JSONResponse(
+    async def handle_unexpected_error(request: Request, _exc: Exception) -> JSONResponse:
+        request_id = getattr(request.state, "request_id", get_request_id())
+        response = JSONResponse(
             status_code=500,
-            content=_payload("INTERNAL_ERROR", "服务暂时无法完成请求，请稍后重试。", True),
+            content=_payload(
+                "INTERNAL_ERROR", "服务暂时无法完成请求，请稍后重试。", True, request_id
+            ),
         )
+        response.headers["X-Request-ID"] = request_id
+        return response

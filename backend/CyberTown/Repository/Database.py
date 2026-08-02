@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 import aiosqlite
@@ -82,6 +82,45 @@ CREATE INDEX IF NOT EXISTS idx_memories_lookup
 ON memory_events(player_id, npc_id, importance DESC, created_at DESC);
 """
 
+MIGRATION_2 = """
+ALTER TABLE dialogue_turns
+ADD COLUMN npc_title_snapshot TEXT NOT NULL DEFAULT '';
+"""
+
+MIGRATIONS = ((1, MIGRATION_1), (2, MIGRATION_2))
+
+REQUIRED_SCHEMA_V1 = {
+    "players": {"player_id", "display_name", "created_at"},
+    "dialogue_turns": {
+        "turn_id", "request_id", "client_request_id", "request_fingerprint",
+        "player_id", "npc_id", "npc_name_snapshot", "player_message", "npc_reply",
+        "reply_source", "interaction_tags_json", "relationship_delta",
+        "relationship_reason", "memory_saved", "created_at",
+    },
+    "relationships": {
+        "player_id", "npc_id", "score", "interaction_count",
+        "positive_points_today", "positive_points_date", "updated_at",
+    },
+    "relationship_events": {
+        "event_id", "turn_id", "player_id", "npc_id", "rule_id", "old_score", "delta",
+        "new_score", "reason", "interaction_count", "positive_points_today",
+        "positive_points_date", "created_at",
+    },
+    "memory_events": {
+        "memory_id", "source_turn_id", "player_id", "npc_id", "memory_type", "summary",
+        "normalized_terms_json", "importance", "created_at", "last_recalled_at",
+        "recall_count",
+    },
+}
+REQUIRED_SCHEMA = {
+    **REQUIRED_SCHEMA_V1,
+    "dialogue_turns": REQUIRED_SCHEMA_V1["dialogue_turns"] | {"npc_title_snapshot"},
+}
+
+
+class IncompatibleSchemaError(RuntimeError):
+    pass
+
 
 class Database:
     def __init__(self, path: Path) -> None:
@@ -90,27 +129,52 @@ class Database:
 
     async def initialize(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.ready = False
         async with self.connection() as connection:
             await connection.execute("PRAGMA journal_mode = WAL")
-            await connection.execute(
-                """
-                CREATE TABLE IF NOT EXISTS schema_migrations (
-                    version INTEGER PRIMARY KEY,
-                    applied_at TEXT NOT NULL
-                )
-                """
-            )
-            cursor = await connection.execute(
-                "SELECT 1 FROM schema_migrations WHERE version = 1"
-            )
-            if await cursor.fetchone() is None:
-                await connection.executescript(MIGRATION_1)
+            try:
+                await connection.execute("BEGIN IMMEDIATE")
                 await connection.execute(
-                    "INSERT INTO schema_migrations(version, applied_at) "
-                    "VALUES(1, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
+                    """
+                    CREATE TABLE IF NOT EXISTS schema_migrations (
+                        version INTEGER PRIMARY KEY,
+                        applied_at TEXT NOT NULL
+                    )
+                    """
                 )
-            await connection.commit()
+                for version, migration in MIGRATIONS:
+                    cursor = await connection.execute(
+                        "SELECT 1 FROM schema_migrations WHERE version = ?", (version,)
+                    )
+                    if await cursor.fetchone() is not None:
+                        if version == 1:
+                            await self._validate_schema(connection, REQUIRED_SCHEMA_V1)
+                        continue
+                    await connection.executescript(migration)
+                    await connection.execute(
+                        "INSERT INTO schema_migrations(version, applied_at) "
+                        "VALUES(?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))",
+                        (version,),
+                    )
+                await self._validate_schema(connection, REQUIRED_SCHEMA)
+                await connection.commit()
+            except Exception:
+                with suppress(aiosqlite.Error):
+                    await connection.rollback()
+                raise
         self.ready = True
+
+    async def _validate_schema(
+        self, connection: aiosqlite.Connection, schema: dict[str, set[str]]
+    ) -> None:
+        for table_name, expected_columns in schema.items():
+            cursor = await connection.execute(f'PRAGMA table_info("{table_name}")')
+            columns = {row["name"] for row in await cursor.fetchall()}
+            if not expected_columns <= columns:
+                missing = ", ".join(sorted(expected_columns - columns))
+                raise IncompatibleSchemaError(
+                    f"database schema is incomplete: {table_name} missing {missing}"
+                )
 
     @asynccontextmanager
     async def connection(self) -> AsyncIterator[aiosqlite.Connection]:

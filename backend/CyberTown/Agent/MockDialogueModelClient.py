@@ -68,6 +68,8 @@ class MockDialogueModelClient(BaseDialogueModelClient):
             if not match:
                 continue
             value = match.group(1).strip()
+            if any(token in value for token in ("什么", "谁", "吗", "哪", "？", "?")):
+                continue
             candidates.append(
                 MemoryCandidate(
                     memory_type=memory_type,

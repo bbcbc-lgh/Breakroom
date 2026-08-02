@@ -24,6 +24,8 @@ backend/logs/
 # Godot generated files and exports
 Godot/.godot/
 Godot/export.cfg
+Godot/Tests/capture-*.png
+Godot/Tests/capture-*.png.import
 build/
 dist/
 release/

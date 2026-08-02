@@ -69,12 +69,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.middleware("http")
     async def request_context(request, call_next):
         request_id = new_request_id()
+        request.state.request_id = request_id
         token = set_request_id(request_id)
         try:
             response = await call_next(request)
-            response.headers["X-Request-ID"] = getattr(
-                request.state, "response_request_id", request_id
-            )
+            response.headers["X-Request-ID"] = request_id
             return response
         finally:
             reset_request_id(token)

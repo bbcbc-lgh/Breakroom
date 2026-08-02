@@ -146,7 +146,7 @@ API 只返回表现层需要的字段，不返回完整系统提示或行为边�
 
 ## 6. 幂等行为
 
-- 相同 `client_request_id` 和相同请求体再次提交，返回首次保存的完整结果，HTTP `200`。
+- 相同 `client_request_id` 和相同请求体再次提交，返回首次保存的业务结果，HTTP `200`；每次 HTTP 请求仍生成新的 `request_id` 以保持日志可追踪。
 - 相同 `client_request_id` 配合不同请求体，返回 `409 REQUEST_ID_CONFLICT`。
 - Godot 收到重复结果时按 `client_request_id` 去重渲染。
 

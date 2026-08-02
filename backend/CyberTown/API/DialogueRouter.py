@@ -45,9 +45,8 @@ async def create_dialogue(payload: DialogueRequest, request: Request) -> Dialogu
             retryable=True,
         ) from exc
 
-    request.state.response_request_id = result.request_id
     return DialogueResponse(
-        request_id=result.request_id,
+        request_id=get_request_id(),
         client_request_id=result.client_request_id,
         npc=DialogueNPCResponse(
             npc_id=result.profile.npc_id,
