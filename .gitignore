@@ -1,0 +1,35 @@
+# Secrets and local configuration
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Python
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+*.py[cod]
+
+# Runtime data and logs
+backend/logs/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.log
+
+# Godot generated files and exports
+Godot/.godot/
+Godot/export.cfg
+build/
+dist/
+release/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
