@@ -6,10 +6,10 @@ backend/.env.*
 # Python
 backend/.venv/
 backend/venv/
-backend/__pycache__/
-backend/.pytest_cache/
+__pycache__/
+.pytest_cache/
 backend/.mypy_cache/
-backend/.ruff_cache/
+.ruff_cache/
 *.py[cod]
 
 # Runtime data and logs
