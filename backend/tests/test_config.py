@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from pydantic import SecretStr
+
 from CyberTown.Config import PROJECT_ROOT, Settings
 
 
@@ -21,3 +23,34 @@ def test_settings_accept_explicit_content_path(tmp_path: Path) -> None:
     settings = Settings(content_path=path)
 
     assert settings.content_path == path
+
+
+def test_settings_accept_existing_llm_environment_names(monkeypatch) -> None:
+    monkeypatch.setenv("LLM_BASE_URL", "https://model.example/v1")
+    monkeypatch.setenv("LLM_MODEL_ID", "model-name")
+    monkeypatch.setenv("LLM_API_KEY", "test-secret")
+
+    settings = Settings()
+
+    assert settings.dialogue_mode == "model"
+    assert settings.model_base_url == "https://model.example/v1"
+    assert settings.model_name == "model-name"
+    assert isinstance(settings.model_api_key, SecretStr)
+    assert "test-secret" not in repr(settings)
+
+
+def test_explicit_mock_mode_wins_over_complete_model_configuration() -> None:
+    settings = Settings(
+        dialogue_mode="mock",
+        model_base_url="https://model.example/v1",
+        model_name="model-name",
+        model_api_key="test-secret",
+    )
+
+    assert settings.dialogue_mode == "mock"
+
+
+def test_incomplete_model_configuration_falls_back_to_mock() -> None:
+    settings = Settings(dialogue_mode="model", model_name="model-name")
+
+    assert settings.dialogue_mode == "mock"

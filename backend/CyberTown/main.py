@@ -9,6 +9,9 @@ from fastapi import FastAPI
 from CyberTown.Agent.MockDialogueModelClient import MockDialogueModelClient
 from CyberTown.Agent.NPCContextBuilder import NPCContextBuilder
 from CyberTown.Agent.NPCDialogueAgent import NPCDialogueAgent
+from CyberTown.Agent.OpenAICompatibleDialogueModelClient import (
+    OpenAICompatibleDialogueModelClient,
+)
 from CyberTown.API.DialogueRouter import router as dialogue_router
 from CyberTown.API.ErrorHandler import register_error_handlers
 from CyberTown.API.HealthRouter import router as health_router
@@ -35,7 +38,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app_settings = settings or get_settings()
     document = NPCConfigLoader().load(app_settings.content_path)
     npc_service = NPCService(document)
-    dialogue_agent = NPCDialogueAgent(MockDialogueModelClient())
+    if app_settings.dialogue_mode == "model":
+        model_client = OpenAICompatibleDialogueModelClient(
+            base_url=app_settings.model_base_url,
+            model_name=app_settings.model_name,
+            api_key=app_settings.model_api_key.get_secret_value(),
+            timeout_seconds=app_settings.model_timeout_seconds,
+        )
+    else:
+        model_client = MockDialogueModelClient()
+    dialogue_agent = NPCDialogueAgent(model_client)
     database = Database(app_settings.database_path)
     dialogue_repository = DialogueRepository()
     relationship_repository = RelationshipRepository()

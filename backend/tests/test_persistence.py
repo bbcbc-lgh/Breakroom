@@ -9,6 +9,7 @@ import httpx
 import pytest
 
 from CyberTown.Config import Settings
+from CyberTown.Domain.Dialogue import DialogueModelResult
 from CyberTown.main import create_app
 from CyberTown.Repository.Database import MIGRATION_1, Database, IncompatibleSchemaError
 from CyberTown.Service.DialogueService import PersistenceError
@@ -134,6 +135,45 @@ async def test_memory_survives_restart_and_is_isolated_by_npc(tmp_path: Path) ->
             json=_payload("zhang_xu", "今天天气怎么样"),
         )
     assert "蓝色" not in unrelated.json()["reply"]
+
+
+async def test_model_fallback_is_persisted_without_relationship_or_memory_change(
+    tmp_path: Path, monkeypatch
+) -> None:
+    app = create_app(Settings(data_dir=tmp_path))
+
+    async def fallback(_context):
+        return DialogueModelResult(
+            reply="刚才的思路断了一下，请稍后重试。",
+            interaction_tags=frozenset({"respectful", "shares_personal_fact"}),
+            reply_source="fallback",
+            degraded=True,
+        )
+
+    monkeypatch.setattr(app.state.dialogue_service._dialogue_agent, "respond", fallback)
+    async with app.router.lifespan_context(app):
+        response = await _request(
+            app,
+            "POST",
+            "/api/v1/dialogues",
+            json=_payload("zhang_xu", "我喜欢蓝色，谢谢你"),
+        )
+        history = await _request(
+            app, "GET", "/api/v1/conversations/zhang_xu?player_id=local-player"
+        )
+        async with app.state.database.connection() as connection:
+            memory_count = (
+                await (await connection.execute("SELECT COUNT(*) FROM memory_events")).fetchone()
+            )[0]
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["reply_source"] == "fallback"
+    assert body["degraded"] is True
+    assert body["relationship"]["delta"] == 0
+    assert body["memory_saved"] is False
+    assert history.json()["messages"][-1]["reply_source"] == "fallback"
+    assert memory_count == 0
 
 
 async def test_relationship_and_history_survive_restart(tmp_path: Path) -> None:
