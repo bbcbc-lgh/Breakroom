@@ -1,0 +1,6 @@
+Font notice
+===========
+
+Cyber Town 0.1.0 does not bundle a separate third-party font file. Text is
+rendered through Godot's built-in/system font fallback. Consequently there is
+no project-specific font asset license to reproduce in this release.

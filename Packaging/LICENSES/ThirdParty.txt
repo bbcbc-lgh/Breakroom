@@ -1,0 +1,38 @@
+Third-party software notices
+============================
+
+This release contains a Godot executable and a PyInstaller-frozen Python
+backend. Godot's license is reproduced in Godot.txt. The backend includes
+Python 3.11 and the packages listed below. Versions are resolved by uv.lock.
+
+Component             License
+--------------------  -------------------------------------------------------
+Python 3.11            Python Software Foundation License 2.0
+PyInstaller            GPL-2.0-or-later with PyInstaller Bootloader Exception
+aiosqlite               MIT
+annotated-doc           MIT
+annotated-types         MIT
+anyio                   MIT
+certifi                 MPL-2.0
+click                   BSD-3-Clause
+FastAPI                 MIT
+h11                     MIT
+httpcore                BSD-3-Clause
+httpx                   BSD-3-Clause
+idna                    BSD-3-Clause
+Pydantic                MIT
+pydantic-core           MIT
+pydantic-settings       MIT
+python-dotenv           BSD-3-Clause
+Starlette               BSD-3-Clause
+typing-extensions       PSF-2.0
+typing-inspection       MIT
+Uvicorn                 BSD-3-Clause
+
+Source distributions and complete license texts are available from the
+Python Package Index package pages and their linked source repositories:
+https://pypi.org/
+
+The original Cyber Town placeholder pixel artwork and interface assets in
+this prototype were created for this project and do not incorporate external
+art packs or third-party font files.

@@ -8,6 +8,7 @@ from pydantic import SecretStr
 
 from CyberTown.Config import APP_VERSION, Settings
 from CyberTown.main import _parse_args, _settings_from_args, create_app
+from CyberTown.RuntimeStreams import ensure_standard_streams
 
 
 def test_create_app_keeps_explicit_settings() -> None:
@@ -17,6 +18,18 @@ def test_create_app_keeps_explicit_settings() -> None:
 
     assert app.version == APP_VERSION
     assert app.state.settings is settings
+
+
+def test_windowed_backend_restores_missing_standard_streams(monkeypatch) -> None:
+    monkeypatch.setattr(sys, "stdout", None)
+    monkeypatch.setattr(sys, "stderr", None)
+
+    ensure_standard_streams()
+
+    assert sys.stdout is not None
+    assert sys.stderr is not None
+    sys.stdout.close()
+    sys.stderr.close()
 
 
 def test_command_line_overrides_runtime_paths(tmp_path) -> None:

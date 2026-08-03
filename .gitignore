@@ -29,6 +29,7 @@ Godot/Tests/capture-*.png.import
 build/
 dist/
 release/
+Release/
 
 # Editors and operating systems
 .idea/

@@ -32,6 +32,7 @@ from CyberTown.Repository.Database import Database
 from CyberTown.Repository.DialogueRepository import DialogueRepository
 from CyberTown.Repository.MemoryRepository import MemoryRepository
 from CyberTown.Repository.RelationshipRepository import RelationshipRepository
+from CyberTown.RuntimeStreams import ensure_standard_streams
 from CyberTown.Service.DialogueService import DialogueService
 from CyberTown.Service.MemoryService import MemoryService
 from CyberTown.Service.NPCService import NPCService
@@ -164,6 +165,7 @@ def _settings_from_args(args: argparse.Namespace) -> Settings:
 
 
 def run(argv: list[str] | None = None) -> None:
+    ensure_standard_streams()
     settings = _settings_from_args(_parse_args(argv))
     configure_logging(settings.log_dir)
     runtime_app = create_app(settings)

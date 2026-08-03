@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -15,6 +16,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 def _user_root() -> Path:
     base = os.environ.get("APPDATA") or os.environ.get("LOCALAPPDATA")
     return Path(base) / "CyberTown" if base else Path.home() / ".cyber-town"
+
+
+def _env_path() -> Path:
+    if getattr(sys, "frozen", False):
+        return _user_root() / ".env"
+    return PROJECT_ROOT / "backend" / ".env"
 
 
 class Settings(BaseSettings):
@@ -65,4 +72,4 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    return Settings(_env_file=PROJECT_ROOT / "backend" / ".env", _env_file_encoding="utf-8")
+    return Settings(_env_file=_env_path(), _env_file_encoding="utf-8")
