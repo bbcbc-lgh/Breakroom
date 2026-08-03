@@ -89,7 +89,7 @@ Godot 导出需要 4.7.1 对应的 Windows export template。开发前置检查�
 
 ```powershell
 python -m src.main --dialogue-mode mock
-D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\HelloAgents\CyberTown\Game
+D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\CyberTown\Game
 ```
 
 具体虚拟环境命令和 Python 支持版本在开发计划中锁定，并以实际依赖测试为准。
