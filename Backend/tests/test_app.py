@@ -6,9 +6,9 @@ import sys
 import pytest
 from pydantic import SecretStr
 
-from CyberTown.Config import APP_VERSION, Settings
-from CyberTown.main import _parse_args, _settings_from_args, create_app
-from CyberTown.RuntimeStreams import ensure_standard_streams
+from src.Config import APP_VERSION, Settings
+from src.main import _parse_args, _settings_from_args, create_app
+from src.RuntimeStreams import ensure_standard_streams
 
 
 def test_create_app_keeps_explicit_settings() -> None:
@@ -67,7 +67,7 @@ def test_command_line_model_mode_without_model_config_falls_back_to_mock(
     monkeypatch,
 ) -> None:
     monkeypatch.setattr(
-        "CyberTown.main.get_settings",
+        "src.main.get_settings",
         lambda: Settings(
             dialogue_mode="mock",
             model_base_url="",
@@ -83,7 +83,7 @@ def test_command_line_model_mode_without_model_config_falls_back_to_mock(
 
 def test_command_line_overrides_preserve_complete_model_config(monkeypatch) -> None:
     monkeypatch.setattr(
-        "CyberTown.main.get_settings",
+        "src.main.get_settings",
         lambda: Settings(
             dialogue_mode="model",
             model_base_url="https://model.example/v1",

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from CyberTown.Agent.BaseDialogueModelClient import BaseDialogueModelClient
-from CyberTown.Domain.Dialogue import INTERACTION_TAGS, DialogueContext, DialogueModelResult
+from src.Agent.BaseDialogueModelClient import BaseDialogueModelClient
+from src.Domain.Dialogue import INTERACTION_TAGS, DialogueContext, DialogueModelResult
 
 
 class NPCDialogueAgent:

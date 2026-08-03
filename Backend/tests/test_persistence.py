@@ -10,12 +10,12 @@ from uuid import uuid4
 import httpx
 import pytest
 
-from CyberTown.Config import Settings
-from CyberTown.Domain.Dialogue import DialogueModelResult
-from CyberTown.main import create_app
-from CyberTown.Observability.Logging import JsonFormatter
-from CyberTown.Repository.Database import MIGRATION_1, Database, IncompatibleSchemaError
-from CyberTown.Service.DialogueService import PersistenceError
+from src.Config import Settings
+from src.Domain.Dialogue import DialogueModelResult
+from src.main import create_app
+from src.Observability.Logging import JsonFormatter
+from src.Repository.Database import MIGRATION_1, Database, IncompatibleSchemaError
+from src.Service.DialogueService import PersistenceError
 
 
 async def _request(

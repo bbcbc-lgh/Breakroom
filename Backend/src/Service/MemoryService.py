@@ -8,9 +8,9 @@ from uuid import uuid4
 
 import aiosqlite
 
-from CyberTown.Domain.Dialogue import MemoryCandidate
-from CyberTown.Domain.MemoryEvent import StoredMemory
-from CyberTown.Repository.MemoryRepository import MemoryRepository
+from src.Domain.Dialogue import MemoryCandidate
+from src.Domain.MemoryEvent import StoredMemory
+from src.Repository.MemoryRepository import MemoryRepository
 
 
 def _normalize(value: str) -> str:

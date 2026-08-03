@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Literal
 
-from CyberTown.Domain.NPCProfile import NPCProfile
-from CyberTown.Domain.Relationship import RelationshipDecision
+from src.Domain.NPCProfile import NPCProfile
+from src.Domain.Relationship import RelationshipDecision
 
 ReplySource = Literal["mock", "model", "fallback"]
 INTERACTION_TAGS = {

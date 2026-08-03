@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from CyberTown.Config import PROJECT_ROOT
-from CyberTown.Infrastructure.NPCConfigLoader import NPCConfigError, NPCConfigLoader
+from src.Config import PROJECT_ROOT
+from src.Infrastructure.NPCConfigLoader import NPCConfigError, NPCConfigLoader
 
 
 def test_loads_canonical_npc_profiles() -> None:

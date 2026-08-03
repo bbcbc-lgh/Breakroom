@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from CyberTown.Observability.RequestContext import get_request_id
+from src.Observability.RequestContext import get_request_id
 
 
 class PublicError(Exception):

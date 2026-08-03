@@ -7,12 +7,12 @@ from collections.abc import Callable
 import httpx
 import pytest
 
-from CyberTown.Agent.OpenAICompatibleDialogueModelClient import (
+from src.Agent.OpenAICompatibleDialogueModelClient import (
     OpenAICompatibleDialogueModelClient,
 )
-from CyberTown.Config import PROJECT_ROOT
-from CyberTown.Domain.Dialogue import ConversationMessage, DialogueContext
-from CyberTown.Infrastructure.NPCConfigLoader import NPCConfigLoader
+from src.Config import PROJECT_ROOT
+from src.Domain.Dialogue import ConversationMessage, DialogueContext
+from src.Infrastructure.NPCConfigLoader import NPCConfigLoader
 
 
 def _context(npc_index: int = 0) -> DialogueContext:

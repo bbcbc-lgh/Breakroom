@@ -1,6 +1,6 @@
 # 赛博小镇（Cyber Town）
 
-Chapter15 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
+第十五章 CyberTown 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
 与张旭、樊玥燚、胡佳烙对话；对话历史、关系和长期记忆保存在本地 SQLite。
 项目不依赖 Helix，默认 mock 模式无需网络或密钥，也支持 OpenAI Chat Completions
 兼容接口。
@@ -65,7 +65,7 @@ NPC 内容只编辑 `Content/NPCProfiles.json`。修改显示名称或性格后�
 ## 验证
 
 ```powershell
-Backend\.venv\Scripts\python.exe -m ruff check Backend\CyberTown Backend\tests Backend\RunBackend.py
+Backend\.venv\Scripts\python.exe -m ruff check Backend\src Backend\tests Backend\RunBackend.py
 Backend\.venv\Scripts\python.exe -m pytest -q Backend\tests
 D:\Godot\Godot_v4.7.1-stable_win64.exe --headless --path Game --script res://Tests/TestRunner.gd
 ```

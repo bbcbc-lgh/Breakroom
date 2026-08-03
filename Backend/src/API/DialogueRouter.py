@@ -1,10 +1,10 @@
 import aiosqlite
 from fastapi import APIRouter, Request
 
-from CyberTown.API.ErrorHandler import PublicError
-from CyberTown.Domain.Relationship import relationship_level
-from CyberTown.Observability.RequestContext import get_request_id
-from CyberTown.Schema.DialogueSchema import (
+from src.API.ErrorHandler import PublicError
+from src.Domain.Relationship import relationship_level
+from src.Observability.RequestContext import get_request_id
+from src.Schema.DialogueSchema import (
     ConversationMessageResponse,
     ConversationResponse,
     DialogueNPCResponse,
@@ -12,8 +12,8 @@ from CyberTown.Schema.DialogueSchema import (
     DialogueResponse,
     RelationshipResponse,
 )
-from CyberTown.Service.DialogueService import PersistenceError, RequestIdConflictError
-from CyberTown.Service.NPCService import NPCNotFoundError
+from src.Service.DialogueService import PersistenceError, RequestIdConflictError
+from src.Service.NPCService import NPCNotFoundError
 
 router = APIRouter(prefix="/api/v1", tags=["dialogue"])
 

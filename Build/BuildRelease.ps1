@@ -61,7 +61,7 @@ New-Item -ItemType Directory -Path $releaseBase, $buildRoot, $releaseRoot -Force
 
 Push-Location $backendRoot
 try {
-    & $python -m ruff check CyberTown tests RunBackend.py
+    & $python -m ruff check src tests RunBackend.py
     if ($LASTEXITCODE -ne 0) { throw 'Ruff failed.' }
     & $python -m pytest -q
     if ($LASTEXITCODE -ne 0) { throw 'Backend tests failed.' }

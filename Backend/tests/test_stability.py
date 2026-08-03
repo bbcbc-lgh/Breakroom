@@ -8,9 +8,9 @@ from uuid import uuid4
 
 import httpx
 
-from CyberTown.Config import Settings
-from CyberTown.main import create_app
-from CyberTown.Observability.Logging import JsonFormatter
+from src.Config import Settings
+from src.main import create_app
+from src.Observability.Logging import JsonFormatter
 
 NPC_IDS = ("zhang_xu", "fan_yueyi", "hu_jialao")
 

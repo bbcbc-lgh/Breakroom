@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from CyberTown.Domain.Dialogue import ConversationMessage, DialogueContext
-from CyberTown.Domain.NPCProfile import NPCProfile
+from src.Domain.Dialogue import ConversationMessage, DialogueContext
+from src.Domain.NPCProfile import NPCProfile
 
 
 class NPCContextBuilder:

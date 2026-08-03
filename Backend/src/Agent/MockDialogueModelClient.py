@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 
-from CyberTown.Agent.BaseDialogueModelClient import BaseDialogueModelClient
-from CyberTown.Domain.Dialogue import DialogueContext, DialogueModelResult, MemoryCandidate
+from src.Agent.BaseDialogueModelClient import BaseDialogueModelClient
+from src.Domain.Dialogue import DialogueContext, DialogueModelResult, MemoryCandidate
 
 
 class MockDialogueModelClient(BaseDialogueModelClient):

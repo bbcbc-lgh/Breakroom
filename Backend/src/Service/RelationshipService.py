@@ -4,7 +4,7 @@ import re
 import unicodedata
 from datetime import date
 
-from CyberTown.Domain.Relationship import (
+from src.Domain.Relationship import (
     RelationshipDecision,
     RelationshipState,
     relationship_level,

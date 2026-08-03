@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import aiosqlite
 
-from CyberTown.Domain.Relationship import RelationshipDecision, RelationshipState
+from src.Domain.Relationship import RelationshipDecision, RelationshipState
 
 
 class RelationshipRepository:

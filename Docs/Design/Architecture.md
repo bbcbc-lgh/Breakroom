@@ -100,7 +100,7 @@ sequenceDiagram
 不为 Python namespace package 新增 `__init__.py`。
 
 ```text
-Chapter15/
+CyberTown/
 |-- README.md                       # 开发、验证和发布入口
 |-- Docs/
 |   |-- REQUIRE.md                  # 需求与 AC-01 至 AC-10
@@ -123,7 +123,7 @@ Chapter15/
 |   |-- uv.lock
 |   |-- .env.example
 |   |-- RunBackend.py
-|   |-- CyberTown/
+|   |-- src/                       # Python 后端包
 |   |   |-- main.py                 # FastAPI 应用工厂和命令行入口
 |   |   |-- Config.py               # 环境配置和路径解析
 |   |   |-- API/                    # HTTP 路由和公共错误

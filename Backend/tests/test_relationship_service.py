@@ -2,8 +2,8 @@ from datetime import date
 
 import pytest
 
-from CyberTown.Domain.Relationship import RelationshipState, relationship_level
-from CyberTown.Service.RelationshipService import RelationshipService
+from src.Domain.Relationship import RelationshipState, relationship_level
+from src.Service.RelationshipService import RelationshipService
 
 
 @pytest.mark.parametrize(

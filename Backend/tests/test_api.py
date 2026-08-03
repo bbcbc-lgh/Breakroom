@@ -6,8 +6,8 @@ from uuid import uuid4
 
 import httpx
 
-from CyberTown.Config import Settings
-from CyberTown.main import create_app
+from src.Config import Settings
+from src.main import create_app
 
 
 @asynccontextmanager

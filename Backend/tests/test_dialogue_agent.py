@@ -1,8 +1,8 @@
-from CyberTown.Agent.BaseDialogueModelClient import BaseDialogueModelClient
-from CyberTown.Agent.NPCDialogueAgent import NPCDialogueAgent
-from CyberTown.Config import PROJECT_ROOT
-from CyberTown.Domain.Dialogue import DialogueContext, DialogueModelResult
-from CyberTown.Infrastructure.NPCConfigLoader import NPCConfigLoader
+from src.Agent.BaseDialogueModelClient import BaseDialogueModelClient
+from src.Agent.NPCDialogueAgent import NPCDialogueAgent
+from src.Config import PROJECT_ROOT
+from src.Domain.Dialogue import DialogueContext, DialogueModelResult
+from src.Infrastructure.NPCConfigLoader import NPCConfigLoader
 
 
 class UntrustedModelClient(BaseDialogueModelClient):

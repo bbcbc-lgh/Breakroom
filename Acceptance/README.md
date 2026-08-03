@@ -1,4 +1,4 @@
-# Chapter15 阶段七验收记录
+# CyberTown（第十五章）阶段七验收记录
 
 验收时间：2026-08-03（Asia/Shanghai）
 
@@ -10,15 +10,15 @@
 
 `AC-01` 至 `AC-10` 全部通过。验收期间发现并修复了 Godot 干净缓存首次解析依赖全局类缓存的问题；`DialogueUI.gd` 与 `Player.gd` 现在显式预加载其脚本依赖。
 
-2026-08-03 按职责重组为 `Docs / Game / Backend / Build` 后执行了完整重建与回归。当前 Release ZIP SHA-256 为：
+2026-08-03 按职责重组为 `Docs / Game / Backend / Build`，随后将项目根改名为 `CyberTown`、Python 包改名为 `Backend/src`，并执行完整重建与回归。当前 Release ZIP SHA-256 为：
 
-`00b71243da9f67fa16e02b4f228150c7c3d6c0de05741d305a278f3ed3fe9979`
+`db89273b1ba7be1547221e5b45afd58ee3cea5bf73ab0f0fd0d97b56ea3d0dc1`
 
 ## 自动化结果
 
 | 检查 | 命令 | 实际结果 |
 | --- | --- | --- |
-| Ruff | `Backend\.venv\Scripts\python.exe -m ruff check --no-cache Backend\CyberTown Backend\tests Backend\RunBackend.py Acceptance\BackendProbe.py` | `All checks passed!` |
+| Ruff | `Backend\.venv\Scripts\python.exe -m ruff check --no-cache Backend\src Backend\tests Backend\RunBackend.py Acceptance\BackendProbe.py` | `All checks passed!` |
 | 后端回归 | `python -m pytest -q -p no:cacheprovider Backend\tests`（`PYTHONDONTWRITEBYTECODE=1`） | `73 passed in 5.32s` |
 | Godot 干净导入 | `Godot_v4.7.1-stable_win64_console.exe --headless --import --path Game` | 5 个 SVG 全部导入，脚本类注册完成，退出码 0 |
 | Godot 测试 | `Godot_v4.7.1-stable_win64_console.exe --headless --path Game --script res://Tests/TestRunner.gd` | content、movement、collision、interaction、dialogue、health、runtime command、startup layout 全部通过，无脚本或资源错误 |
@@ -31,10 +31,11 @@
 
 | 检查 | 实际结果 |
 | --- | --- |
-| 后端 | Ruff 通过，`73 passed in 5.17s` |
+| 后端 | `Backend/src` 通过 Ruff；完整构建中 `73 passed in 5.88s` |
 | Godot | 从空 `Game/.godot` 导入成功；完整交互测试通过 |
 | 运行模式 | 三 NPC 的 mock、真实模型和 fallback 全部通过；SQLite 重启与隔离通过 |
 | 完整构建 | `Build/BuildRelease.ps1 -Version 0.1.0 -AllowDirty` 成功完成 PyInstaller、Godot 导出、ZIP 和烟测 |
+| 路径与包名 | 新根目录 `E:/HelloAgents/CyberTown`；Python 导入根为 `src`；旧 `E:/HelloAgents/Chapter15` 不存在 |
 | Release | 91 个 ZIP 条目，禁用项 0；相关进程 0，8765 监听 0 |
 
 ## AC 验收矩阵

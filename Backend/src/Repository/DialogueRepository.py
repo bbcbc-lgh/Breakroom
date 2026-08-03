@@ -6,8 +6,8 @@ from datetime import UTC, datetime, timedelta
 
 import aiosqlite
 
-from CyberTown.Domain.Dialogue import ConversationMessage, DialogueModelResult
-from CyberTown.Domain.Relationship import RelationshipDecision, relationship_level
+from src.Domain.Dialogue import ConversationMessage, DialogueModelResult
+from src.Domain.Relationship import RelationshipDecision, relationship_level
 
 
 @dataclass(frozen=True, slots=True)

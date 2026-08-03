@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 
-from CyberTown.Config import APP_VERSION
-from CyberTown.Schema.HealthSchema import HealthResponse
+from src.Config import APP_VERSION
+from src.Schema.HealthSchema import HealthResponse
 
 router = APIRouter(tags=["health"])
 

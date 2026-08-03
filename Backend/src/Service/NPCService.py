@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from CyberTown.Domain.NPCProfile import NPCProfile, NPCProfileDocument
+from src.Domain.NPCProfile import NPCProfile, NPCProfileDocument
 
 
 class NPCNotFoundError(LookupError):

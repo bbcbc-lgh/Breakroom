@@ -2,7 +2,7 @@ from pathlib import Path
 
 from pydantic import SecretStr
 
-from CyberTown.Config import PROJECT_ROOT, Settings, _env_path
+from src.Config import PROJECT_ROOT, Settings, _env_path
 
 
 def test_settings_use_safe_local_defaults() -> None:
@@ -57,7 +57,7 @@ def test_incomplete_model_configuration_falls_back_to_mock() -> None:
 
 
 def test_frozen_backend_reads_user_env(monkeypatch) -> None:
-    monkeypatch.setattr("CyberTown.Config.sys.frozen", True, raising=False)
+    monkeypatch.setattr("src.Config.sys.frozen", True, raising=False)
     monkeypatch.setenv("APPDATA", "C:/Users/test/AppData/Roaming")
 
     assert _env_path() == Path("C:/Users/test/AppData/Roaming/CyberTown/.env")

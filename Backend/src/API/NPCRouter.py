@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from CyberTown.Schema.NPCSchema import NPCListResponse, NPCResponse, SpawnResponse
+from src.Schema.NPCSchema import NPCListResponse, NPCResponse, SpawnResponse
 
 router = APIRouter(prefix="/api/v1", tags=["npcs"])
 

@@ -8,7 +8,7 @@
 
 ## 1. 交付目标
 
-在 `E:/HelloAgents/Chapter15` 独立 Git 仓库内完成一个 Windows 可发布原型：玩家可在原创像素办公室中移动、与张旭、樊玥燚、胡佳烙交谈；对话、关系和长期记忆持久化；默认 mock 模式无需密钥；配置真实模型后启用 AI 回复；最终提供无需安装 Godot 或 Python 的发布目录。
+在 `E:/HelloAgents/CyberTown` 独立 Git 仓库内完成一个 Windows 可发布原型：玩家可在原创像素办公室中移动、与张旭、樊玥燚、胡佳烙交谈；对话、关系和长期记忆持久化；默认 mock 模式无需密钥；配置真实模型后启用 AI 回复；最终提供无需安装 Godot 或 Python 的发布目录。
 
 开发只在本计划确认后开始。每个阶段必须通过对应验证门，不能用“代码已写完”代替运行证据。
 
@@ -31,13 +31,13 @@
 
 依赖版本由首阶段解析并写入 `uv.lock`；不在计划文档中猜测未来具体补丁版本。
 
-除非命令旁另有说明，所有相对路径命令均从 `E:/HelloAgents/Chapter15` 执行。
+除非命令旁另有说明，所有相对路径命令均从 `E:/HelloAgents/CyberTown` 执行。
 
 ## 3. 全程约束
 
 - 不读取、打印、复制或提交 `Backend/.env`。
 - 不新增 Python `__init__.py`；使用 namespace package 导入。
-- 不依赖或复制 `Chapter11/Helix`，只实现已批准的 Chapter15 边界。
+- 不依赖或复制 `Chapter11/Helix`，只实现已批准的 CyberTown（第十五章）边界。
 - 不实现首版范围外的 Qdrant、Neo4j、任务、多场景、多人或管理后台。
 - `Content/NPCProfiles.json` 是 NPC 内容唯一人工编辑源。
 - 每个阶段只修改该阶段需要的文件，避免顺手重构其他章节。

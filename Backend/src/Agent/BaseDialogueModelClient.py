@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from CyberTown.Domain.Dialogue import DialogueContext, DialogueModelResult
+from src.Domain.Dialogue import DialogueContext, DialogueModelResult
 
 
 class BaseDialogueModelClient(ABC):

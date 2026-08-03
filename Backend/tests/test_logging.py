@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from CyberTown.Observability.Logging import JsonFormatter, configure_logging, sanitize
+from src.Observability.Logging import JsonFormatter, configure_logging, sanitize
 
 
 def test_sanitize_redacts_nested_sensitive_values() -> None:

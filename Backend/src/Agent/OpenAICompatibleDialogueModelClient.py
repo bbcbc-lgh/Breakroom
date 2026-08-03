@@ -10,8 +10,8 @@ from typing import Annotated, Any, Literal
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, ValidationError
 
-from CyberTown.Agent.BaseDialogueModelClient import BaseDialogueModelClient
-from CyberTown.Domain.Dialogue import (
+from src.Agent.BaseDialogueModelClient import BaseDialogueModelClient
+from src.Domain.Dialogue import (
     INTERACTION_TAGS,
     DialogueContext,
     DialogueModelResult,

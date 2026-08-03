@@ -11,16 +11,16 @@ from uuid import uuid4
 
 import aiosqlite
 
-from CyberTown.Agent.NPCContextBuilder import NPCContextBuilder
-from CyberTown.Agent.NPCDialogueAgent import NPCDialogueAgent
-from CyberTown.Domain.Dialogue import DialogueResult
-from CyberTown.Domain.Relationship import relationship_level
-from CyberTown.Repository.Database import Database
-from CyberTown.Repository.DialogueRepository import DialogueRepository, StoredTurn
-from CyberTown.Repository.RelationshipRepository import RelationshipRepository
-from CyberTown.Service.MemoryService import MemoryService
-from CyberTown.Service.NPCService import NPCService
-from CyberTown.Service.RelationshipService import RelationshipService
+from src.Agent.NPCContextBuilder import NPCContextBuilder
+from src.Agent.NPCDialogueAgent import NPCDialogueAgent
+from src.Domain.Dialogue import DialogueResult
+from src.Domain.Relationship import relationship_level
+from src.Repository.Database import Database
+from src.Repository.DialogueRepository import DialogueRepository, StoredTurn
+from src.Repository.RelationshipRepository import RelationshipRepository
+from src.Service.MemoryService import MemoryService
+from src.Service.NPCService import NPCService
+from src.Service.RelationshipService import RelationshipService
 
 logger = logging.getLogger("CyberTown.Dialogue")
 

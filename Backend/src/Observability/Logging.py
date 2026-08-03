@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from typing import Any
 
-from CyberTown.Observability.RequestContext import get_request_id
+from src.Observability.RequestContext import get_request_id
 
 SENSITIVE_KEYS = {"api_key", "authorization", "cookie", "model_api_key", "password", "token"}
 

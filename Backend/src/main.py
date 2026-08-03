@@ -10,33 +10,33 @@ from time import perf_counter
 import uvicorn
 from fastapi import FastAPI
 
-from CyberTown.Agent.MockDialogueModelClient import MockDialogueModelClient
-from CyberTown.Agent.NPCContextBuilder import NPCContextBuilder
-from CyberTown.Agent.NPCDialogueAgent import NPCDialogueAgent
-from CyberTown.Agent.OpenAICompatibleDialogueModelClient import (
+from src.Agent.MockDialogueModelClient import MockDialogueModelClient
+from src.Agent.NPCContextBuilder import NPCContextBuilder
+from src.Agent.NPCDialogueAgent import NPCDialogueAgent
+from src.Agent.OpenAICompatibleDialogueModelClient import (
     OpenAICompatibleDialogueModelClient,
 )
-from CyberTown.API.DialogueRouter import router as dialogue_router
-from CyberTown.API.ErrorHandler import register_error_handlers
-from CyberTown.API.HealthRouter import router as health_router
-from CyberTown.API.NPCRouter import router as npc_router
-from CyberTown.Config import APP_VERSION, Settings, get_settings
-from CyberTown.Infrastructure.NPCConfigLoader import NPCConfigLoader
-from CyberTown.Observability.Logging import configure_logging
-from CyberTown.Observability.RequestContext import (
+from src.API.DialogueRouter import router as dialogue_router
+from src.API.ErrorHandler import register_error_handlers
+from src.API.HealthRouter import router as health_router
+from src.API.NPCRouter import router as npc_router
+from src.Config import APP_VERSION, Settings, get_settings
+from src.Infrastructure.NPCConfigLoader import NPCConfigLoader
+from src.Observability.Logging import configure_logging
+from src.Observability.RequestContext import (
     new_request_id,
     reset_request_id,
     set_request_id,
 )
-from CyberTown.Repository.Database import Database
-from CyberTown.Repository.DialogueRepository import DialogueRepository
-from CyberTown.Repository.MemoryRepository import MemoryRepository
-from CyberTown.Repository.RelationshipRepository import RelationshipRepository
-from CyberTown.RuntimeStreams import ensure_standard_streams
-from CyberTown.Service.DialogueService import DialogueService
-from CyberTown.Service.MemoryService import MemoryService
-from CyberTown.Service.NPCService import NPCService
-from CyberTown.Service.RelationshipService import RelationshipService
+from src.Repository.Database import Database
+from src.Repository.DialogueRepository import DialogueRepository
+from src.Repository.MemoryRepository import MemoryRepository
+from src.Repository.RelationshipRepository import RelationshipRepository
+from src.RuntimeStreams import ensure_standard_streams
+from src.Service.DialogueService import DialogueService
+from src.Service.MemoryService import MemoryService
+from src.Service.NPCService import NPCService
+from src.Service.RelationshipService import RelationshipService
 
 logger = logging.getLogger("CyberTown.API")
 

@@ -5,8 +5,8 @@ from datetime import datetime
 
 import aiosqlite
 
-from CyberTown.Domain.Dialogue import MemoryCandidate
-from CyberTown.Domain.MemoryEvent import StoredMemory
+from src.Domain.Dialogue import MemoryCandidate
+from src.Domain.MemoryEvent import StoredMemory
 
 
 class MemoryRepository:

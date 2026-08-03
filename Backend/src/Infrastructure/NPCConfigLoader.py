@@ -6,7 +6,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from CyberTown.Domain.NPCProfile import NPCProfileDocument
+from src.Domain.NPCProfile import NPCProfileDocument
 
 
 class NPCConfigError(ValueError):
