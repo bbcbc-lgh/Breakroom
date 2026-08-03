@@ -1,0 +1,40 @@
+{
+  "captured_at": "2026-08-03T16:58:59+08:00",
+  "passed": true,
+  "records": [
+    {
+      "probe": "mock",
+      "health_mode": "mock",
+      "results": [
+        {"npc_id": "zhang_xu", "status": 200, "reply_source": "mock", "degraded": false, "attempts": 1},
+        {"npc_id": "fan_yueyi", "status": 200, "reply_source": "mock", "degraded": false, "attempts": 1},
+        {"npc_id": "hu_jialao", "status": 200, "reply_source": "mock", "degraded": false, "attempts": 1}
+      ]
+    },
+    {
+      "probe": "fallback",
+      "health_mode": "model",
+      "results": [
+        {"npc_id": "zhang_xu", "status": 200, "reply_source": "fallback", "degraded": true, "attempts": 1},
+        {"npc_id": "fan_yueyi", "status": 200, "reply_source": "fallback", "degraded": true, "attempts": 1},
+        {"npc_id": "hu_jialao", "status": 200, "reply_source": "fallback", "degraded": true, "attempts": 1}
+      ]
+    },
+    {
+      "probe": "configured_model",
+      "health_mode": "model",
+      "results": [
+        {"npc_id": "zhang_xu", "status": 200, "reply_source": "model", "degraded": false, "attempts": 1},
+        {"npc_id": "fan_yueyi", "status": 200, "reply_source": "model", "degraded": false, "attempts": 1},
+        {"npc_id": "hu_jialao", "status": 200, "reply_source": "model", "degraded": false, "attempts": 1}
+      ]
+    },
+    {
+      "probe": "sqlite_restart",
+      "memory_saved": true,
+      "same_npc_recalled": true,
+      "cross_npc_isolated": true,
+      "persisted_message_count": 4
+    }
+  ]
+}

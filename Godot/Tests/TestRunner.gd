@@ -47,11 +47,12 @@ func _run() -> void:
 	_test_health_contract()
 	_test_backend_command()
 	await _test_startup_overlay_layout()
+	await _test_movement_collision_and_dialogue_lock()
 	await _test_keyboard_dialogue_flow()
 	await _test_keyboard_interaction()
 	await process_frame
 	if failures.is_empty():
-		print("Godot tests passed: content, interaction, dialogue, health, runtime command, startup layout")
+		print("Godot tests passed: content, movement, collision, interaction, dialogue, health, runtime command, startup layout")
 		quit(0)
 	else:
 		for failure in failures:
@@ -196,6 +197,43 @@ func _test_startup_overlay_layout() -> void:
 	if exit_rect.end.x > root.get_viewport().get_visible_rect().end.x:
 		failures.append("startup exit action exceeds the viewport")
 	overlay.queue_free()
+	await process_frame
+
+
+func _test_movement_collision_and_dialogue_lock() -> void:
+	var wall := StaticBody2D.new()
+	wall.position = Vector2(280, 200)
+	var wall_collision := CollisionShape2D.new()
+	var wall_shape := RectangleShape2D.new()
+	wall_shape.size = Vector2(40, 120)
+	wall_collision.shape = wall_shape
+	wall.add_child(wall_collision)
+	root.add_child(wall)
+	var player = PLAYER_SCENE.instantiate()
+	player.position = Vector2(200, 200)
+	root.add_child(player)
+	await process_frame
+
+	Input.action_press("move_right")
+	for _index in 30:
+		await physics_frame
+	Input.action_release("move_right")
+	if player.position.x <= 200.0:
+		failures.append("movement input did not move the player")
+	if player.position.x > 244.0:
+		failures.append("player crossed a static collision body")
+
+	player.set_interacting(true)
+	var locked_position: Vector2 = player.position
+	Input.action_press("move_left")
+	for _index in 3:
+		await physics_frame
+	Input.action_release("move_left")
+	if not player.position.is_equal_approx(locked_position):
+		failures.append("dialogue state did not lock player movement")
+
+	player.queue_free()
+	wall.queue_free()
 	await process_frame
 
 

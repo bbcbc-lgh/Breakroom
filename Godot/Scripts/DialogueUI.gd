@@ -2,6 +2,8 @@ extends CanvasLayer
 
 signal closed
 
+const DIALOGUE_SESSION = preload("res://Scripts/DialogueSession.gd")
+
 var panel: Panel
 var npc_name_label: Label
 var npc_title_label: Label
@@ -16,7 +18,7 @@ var active_npc_id := ""
 var pending_request_id := ""
 var api_client: Node
 var last_message := ""
-var session := DialogueSession.new()
+var session := DIALOGUE_SESSION.new()
 var waiting_timer: Timer
 var waiting_frame := 0
 
@@ -141,9 +143,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _send() -> void:
 	var message := input.text.strip_edges()
-	if message.is_empty() or session.state == DialogueSession.State.WAITING:
+	if message.is_empty() or session.state == DIALOGUE_SESSION.State.WAITING:
 		return
-	if session.state == DialogueSession.State.ERROR:
+	if session.state == DIALOGUE_SESSION.State.ERROR:
 		pending_request_id = session.retry_request_id()
 		message = last_message
 	else:

@@ -4,7 +4,21 @@ extends Node
 func _ready() -> void:
 	var main = get_tree().current_scene
 	var capture_kind := OS.get_environment("CYBER_TOWN_CAPTURE_KIND")
-	if capture_kind == "dialogue_error":
+	if capture_kind == "dialogue_mock":
+		var npc = main.get_node("NPCs").get_child(0)
+		main._on_interaction_requested(npc)
+		main.dialogue_ui._on_conversation_received({
+			"requested_npc_id": str(npc.profile.get("npc_id", "")),
+			"relationship": {"level": "友好"},
+			"messages": [
+				{"role": "player", "content": "如何验证这次发布构建？"},
+				{
+					"role": "npc",
+					"content": "先固定输入与环境，再逐项记录可复现的验收证据。",
+				},
+			],
+		})
+	elif capture_kind == "dialogue_error":
 		var npc = main.get_node("NPCs").get_child(0)
 		main._on_interaction_requested(npc)
 		main.dialogue_ui._on_conversation_failed(

@@ -3,6 +3,7 @@ extends CharacterBody2D
 signal interaction_requested(npc: Node)
 signal target_changed(npc: Node)
 
+const INTERACTION_SELECTOR = preload("res://Scripts/InteractionSelector.gd")
 const SPEED := 190.0
 var interacting := false
 var nearby_npcs: Array[Node] = []
@@ -63,4 +64,4 @@ func register_npc(npc: Node, entered: bool) -> void:
 
 
 func _nearest_npc() -> Node:
-	return InteractionSelector.choose(global_position, facing, nearby_npcs)
+	return INTERACTION_SELECTOR.choose(global_position, facing, nearby_npcs)
