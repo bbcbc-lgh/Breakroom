@@ -1,36 +1,51 @@
 extends CanvasLayer
 
+signal retry_requested
+
 var label: Label
 var retry_button: Button
 var exit_button: Button
 
 
 func _ready() -> void:
+	var row := HBoxContainer.new()
+	row.position = Vector2(28, 18)
+	row.size = Vector2(1224, 52)
+	row.add_theme_constant_override("separation", 10)
+	add_child(row)
 	label = Label.new()
-	label.position = Vector2(28, 24)
-	label.size = Vector2(560, 52)
 	label.text = "赛博小镇"
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 18)
 	label.add_theme_color_override("font_color", Color("#f4cc76"))
-	add_child(label)
+	row.add_child(label)
 	retry_button = Button.new()
 	retry_button.text = "重试"
-	retry_button.position = Vector2(300, 18)
-	retry_button.size = Vector2(76, 38)
+	retry_button.custom_minimum_size = Vector2(76, 38)
+	retry_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	retry_button.visible = false
-	retry_button.pressed.connect(APIClient.check_health)
-	add_child(retry_button)
+	retry_button.pressed.connect(retry_requested.emit)
+	row.add_child(retry_button)
 	exit_button = Button.new()
 	exit_button.text = "退出"
-	exit_button.position = Vector2(386, 18)
-	exit_button.size = Vector2(76, 38)
+	exit_button.custom_minimum_size = Vector2(76, 38)
+	exit_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	exit_button.visible = false
 	exit_button.pressed.connect(get_tree().quit)
-	add_child(exit_button)
+	row.add_child(exit_button)
 
 
-func set_status(available: bool, _message: String) -> void:
-	label.text = "赛博小镇  /  %s" % ("本地模式" if available else "本地服务未启动")
+func set_starting() -> void:
+	label.text = "赛博小镇  /  正在启动本地服务"
+	label.add_theme_color_override("font_color", Color("#f4cc76"))
+	retry_button.visible = false
+	exit_button.visible = false
+
+
+func set_status(available: bool, message: String) -> void:
+	label.text = "赛博小镇  /  %s" % message
 	label.add_theme_color_override(
 		"font_color", Color("#8ed5c6") if available else Color("#e6a4a0")
 	)

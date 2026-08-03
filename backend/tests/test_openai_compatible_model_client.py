@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Callable
 
 import httpx
@@ -159,6 +160,23 @@ async def test_invalid_or_failed_model_response_uses_fallback(handler) -> None:
     assert result.interaction_tags == frozenset({"neutral"})
     assert result.memory_candidates == ()
     assert "Python / AI 工程师" in result.reply
+
+
+async def test_timeout_logs_a_sanitized_failure_category(caplog) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ReadTimeout("contains-private-diagnostic", request=request)
+
+    model_logger = logging.getLogger("CyberTown.Model")
+    model_logger.addHandler(caplog.handler)
+    try:
+        with caplog.at_level(logging.INFO, logger="CyberTown.Model"):
+            await _client(handler).generate(_context())
+    finally:
+        model_logger.removeHandler(caplog.handler)
+
+    record = caplog.records[-1]
+    assert record.details["failure_type"] == "model_timeout"
+    assert "contains-private-diagnostic" not in record.getMessage()
 
 
 async def test_request_context_is_limited_to_current_npc_and_five_turns() -> None:

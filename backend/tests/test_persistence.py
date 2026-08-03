@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import logging
 import sqlite3
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -11,6 +13,7 @@ import pytest
 from CyberTown.Config import Settings
 from CyberTown.Domain.Dialogue import DialogueModelResult
 from CyberTown.main import create_app
+from CyberTown.Observability.Logging import JsonFormatter
 from CyberTown.Repository.Database import MIGRATION_1, Database, IncompatibleSchemaError
 from CyberTown.Service.DialogueService import PersistenceError
 
@@ -369,14 +372,30 @@ async def test_unexpected_error_keeps_request_id(tmp_path: Path, monkeypatch) ->
         raise RuntimeError("forced API failure")
 
     monkeypatch.setattr(app.state.npc_service, "list_profiles", fail_list)
-    async with app.router.lifespan_context(app):
-        response = await _request(
-            app, "GET", "/api/v1/npcs", raise_app_exceptions=False
-        )
+    logger = logging.getLogger("CyberTown")
+    records: list[str] = []
+
+    class CaptureHandler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            records.append(self.format(record))
+
+    handler = CaptureHandler()
+    handler.setFormatter(JsonFormatter())
+    logger.addHandler(handler)
+    try:
+        async with app.router.lifespan_context(app):
+            response = await _request(
+                app, "GET", "/api/v1/npcs", raise_app_exceptions=False
+            )
+    finally:
+        logger.removeHandler(handler)
 
     assert response.status_code == 500
     assert response.json()["error"]["code"] == "INTERNAL_ERROR"
     assert response.json()["request_id"] == response.headers["X-Request-ID"]
+    failed = next(json.loads(line) for line in records if '"message": "request failed"' in line)
+    assert failed["request_id"] == response.headers["X-Request-ID"]
+    assert failed["details"]["error_code"] == "INTERNAL_ERROR"
 
 
 async def test_database_schema_matches_design_tables(tmp_path: Path) -> None:

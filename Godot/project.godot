@@ -9,6 +9,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 [autoload]
 
 ContentLoader="*res://Autoload/ContentLoader.gd"
+BackendProcessManager="*res://Scripts/BackendProcessManager.gd"
 APIClient="*res://Scripts/APIClient.gd"
 
 [display]

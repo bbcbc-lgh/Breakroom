@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import argparse
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
+from time import perf_counter
 
 import uvicorn
 from fastapi import FastAPI
@@ -32,6 +36,15 @@ from CyberTown.Service.DialogueService import DialogueService
 from CyberTown.Service.MemoryService import MemoryService
 from CyberTown.Service.NPCService import NPCService
 from CyberTown.Service.RelationshipService import RelationshipService
+
+logger = logging.getLogger("CyberTown.API")
+
+
+def _valid_port(value: str) -> int:
+    port = int(value)
+    if not 1024 <= port <= 65535:
+        raise argparse.ArgumentTypeError("port must be between 1024 and 65535")
+    return port
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -83,10 +96,37 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         request_id = new_request_id()
         request.state.request_id = request_id
         token = set_request_id(request_id)
+        started_at = perf_counter()
         try:
             response = await call_next(request)
             response.headers["X-Request-ID"] = request_id
+            logger.info(
+                "request completed",
+                extra={
+                    "details": {
+                        "method": request.method,
+                        "path": request.url.path,
+                        "status_code": response.status_code,
+                        "duration_ms": round((perf_counter() - started_at) * 1000),
+                    }
+                },
+            )
             return response
+        except Exception:
+            logger.error(
+                "request failed",
+                extra={
+                    "details": {
+                        "method": request.method,
+                        "path": request.url.path,
+                        "status_code": 500,
+                        "duration_ms": round((perf_counter() - started_at) * 1000),
+                        "error_code": "INTERNAL_ERROR",
+                        "retryable": True,
+                    }
+                },
+            )
+            raise
         finally:
             reset_request_id(token)
 
@@ -97,13 +137,37 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     return app
 
 
-configure_logging()
-app = create_app()
+def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Cyber Town local backend")
+    parser.add_argument("--host")
+    parser.add_argument("--port", type=_valid_port)
+    parser.add_argument("--data-dir", type=Path)
+    parser.add_argument("--content-path", type=Path)
+    parser.add_argument("--dialogue-mode", choices=("mock", "model"))
+    return parser.parse_args(argv)
 
 
-def run() -> None:
+def _settings_from_args(args: argparse.Namespace) -> Settings:
     settings = get_settings()
-    uvicorn.run(app, host=settings.host, port=settings.port, log_level="info")
+    overrides = {
+        name: value
+        for name, value in {
+            "host": args.host,
+            "port": args.port,
+            "data_dir": args.data_dir,
+            "content_path": args.content_path,
+            "dialogue_mode": args.dialogue_mode,
+        }.items()
+        if value is not None
+    }
+    return Settings.model_validate({**settings.model_dump(), **overrides})
+
+
+def run(argv: list[str] | None = None) -> None:
+    settings = _settings_from_args(_parse_args(argv))
+    configure_logging(settings.log_dir)
+    runtime_app = create_app(settings)
+    uvicorn.run(runtime_app, host=settings.host, port=settings.port, log_level="info")
 
 
 if __name__ == "__main__":

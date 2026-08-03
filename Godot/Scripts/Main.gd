@@ -9,6 +9,13 @@ const INTERACTION_PROMPT_SCENE := preload("res://Scenes/InteractionPrompt.tscn")
 var player: CharacterBody2D
 var dialogue_ui: CanvasLayer
 var active_npc: Node
+var startup_overlay: CanvasLayer
+var backend_launch_attempted := false
+var health_retry_count := 0
+var health_poll_timer: Timer
+var startup_exhausted := false
+
+const HEALTH_RETRY_LIMIT := 10
 
 
 func _ready() -> void:
@@ -82,21 +89,19 @@ func _build_ui() -> void:
 	var prompt := INTERACTION_PROMPT_SCENE.instantiate()
 	add_child(prompt)
 	player.target_changed.connect(prompt.set_target)
-	var overlay := STARTUP_OVERLAY_SCENE.instantiate()
-	add_child(overlay)
-	APIClient.health_received.connect(overlay.set_status)
-	if OS.get_environment("CYBER_TOWN_CAPTURE_DIALOGUE_PATH") != "":
-		var capture_script = load("res://Tests/CaptureDialogue.gd")
+	startup_overlay = STARTUP_OVERLAY_SCENE.instantiate()
+	add_child(startup_overlay)
+	startup_overlay.retry_requested.connect(_retry_backend_startup)
+	APIClient.health_received.connect(_on_backend_health)
+	health_poll_timer = Timer.new()
+	health_poll_timer.wait_time = 15.0
+	health_poll_timer.autostart = true
+	health_poll_timer.timeout.connect(APIClient.check_health)
+	add_child(health_poll_timer)
+	if OS.get_environment("CYBER_TOWN_CAPTURE_KIND") != "":
+		var capture_script = load("res://Tests/CaptureMainState.gd")
 		var capture = capture_script.new()
 		add_child(capture)
-	if OS.get_environment("CYBER_TOWN_CAPTURE_PATH") != "":
-		await get_tree().process_frame
-		await RenderingServer.frame_post_draw
-		var image := get_viewport().get_texture().get_image()
-		var output := OS.get_environment("CYBER_TOWN_CAPTURE_PATH")
-		var result := image.save_png(output)
-		print("Captured %dx%d -> %s" % [image.get_width(), image.get_height(), output])
-		get_tree().quit(0 if result == OK else 1)
 
 
 func _on_interaction_requested(npc: Node) -> void:
@@ -111,3 +116,42 @@ func _on_dialogue_closed() -> void:
 	if is_instance_valid(active_npc):
 		active_npc.set_interacting(false)
 	active_npc = null
+
+
+func _on_backend_health(available: bool, message: String, may_start_backend: bool) -> void:
+	if available:
+		health_retry_count = 0
+		startup_exhausted = false
+		startup_overlay.set_status(true, message)
+		return
+	if not may_start_backend:
+		startup_overlay.set_status(false, message)
+		return
+	if startup_exhausted:
+		startup_overlay.set_status(false, "本地服务启动超时。")
+		return
+	if backend_launch_attempted and not BackendProcessManager.owns_running_backend():
+		backend_launch_attempted = false
+	if not backend_launch_attempted:
+		backend_launch_attempted = true
+		if not BackendProcessManager.start_backend():
+			startup_overlay.set_status(false, "找不到本地服务程序。")
+			return
+		startup_overlay.set_starting()
+	if health_retry_count >= HEALTH_RETRY_LIMIT:
+		BackendProcessManager.stop_owned_backend()
+		startup_exhausted = true
+		startup_overlay.set_status(false, "本地服务启动超时。")
+		return
+	health_retry_count += 1
+	await get_tree().create_timer(0.5).timeout
+	APIClient.check_health()
+
+
+func _retry_backend_startup() -> void:
+	BackendProcessManager.stop_owned_backend()
+	backend_launch_attempted = false
+	health_retry_count = 0
+	startup_exhausted = false
+	startup_overlay.set_starting()
+	APIClient.check_health()

@@ -1,6 +1,6 @@
 extends Node
 
-signal health_received(available: bool, message: String)
+signal health_received(available: bool, message: String, may_start_backend: bool)
 signal dialogue_received(payload: Dictionary)
 signal dialogue_failed(message: String, client_request_id: String)
 signal conversation_received(payload: Dictionary)
@@ -54,7 +54,7 @@ func _request(
 	var error := request.request(BASE_URL + path, headers, method, payload)
 	if error != OK:
 		_remove_request(request)
-		_emit_failure(kind, context_id, "无法连接后端，请确认 FastAPI 已启动。")
+		_emit_failure(kind, context_id, "无法连接本地服务。", true)
 
 
 func _on_request_completed(
@@ -63,7 +63,7 @@ func _on_request_completed(
 ) -> void:
 	_remove_request(request)
 	if result != HTTPRequest.RESULT_SUCCESS:
-		_emit_failure(kind, context_id, "后端连接中断，请稍后重试。")
+		_emit_failure(kind, context_id, "本地服务尚未启动。", true)
 		return
 	var text := body.get_string_from_utf8()
 	var parsed = JSON.parse_string(text)
@@ -71,19 +71,37 @@ func _on_request_completed(
 		var detail := "后端暂时不可用。"
 		if parsed is Dictionary and parsed.has("error"):
 			detail = str(parsed["error"].get("message", detail))
-		_emit_failure(kind, context_id, detail)
+		if kind == "health":
+			detail = "端口 8765 被不兼容的服务占用。"
+		_emit_failure(kind, context_id, detail, false)
 		return
 	match kind:
-		"health": health_received.emit(true, "本地模式")
+		"health": _emit_health(parsed)
 		"dialogue": dialogue_received.emit(parsed)
 		"conversation":
 			parsed["requested_npc_id"] = context_id
 			conversation_received.emit(parsed)
 
 
-func _emit_failure(kind: String, context_id: String, message: String) -> void:
+func _emit_health(payload: Dictionary) -> void:
+	if str(payload.get("version", "")) != "0.1.0":
+		health_received.emit(false, "本地服务版本不兼容。", false)
+		return
+	if str(payload.get("content_version", "")) != ContentLoader.content_version:
+		health_received.emit(false, "NPC 配置版本不一致，请重启游戏与服务。", false)
+		return
+	if str(payload.get("status", "")) != "ready" or not bool(payload.get("database_ready", false)):
+		health_received.emit(false, "本地数据库尚未就绪。", false)
+		return
+	var mode := str(payload.get("dialogue_mode", "mock"))
+	health_received.emit(true, "AI 模式" if mode == "model" else "本地模式", false)
+
+
+func _emit_failure(
+	kind: String, context_id: String, message: String, may_start_backend := false
+) -> void:
 	if kind == "health":
-		health_received.emit(false, message)
+		health_received.emit(false, message, may_start_backend)
 	elif kind == "conversation":
 		conversation_failed.emit(message, context_id)
 	else:

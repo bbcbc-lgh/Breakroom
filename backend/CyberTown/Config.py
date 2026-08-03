@@ -22,6 +22,7 @@ class Settings(BaseSettings):
         env_prefix="CYBER_TOWN_",
         env_file=None,
         extra="ignore",
+        populate_by_name=True,
     )
 
     host: str = "127.0.0.1"

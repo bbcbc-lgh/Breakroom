@@ -3,8 +3,10 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import logging
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
+from time import perf_counter
 from uuid import uuid4
 
 import aiosqlite
@@ -19,6 +21,8 @@ from CyberTown.Repository.RelationshipRepository import RelationshipRepository
 from CyberTown.Service.MemoryService import MemoryService
 from CyberTown.Service.NPCService import NPCService
 from CyberTown.Service.RelationshipService import RelationshipService
+
+logger = logging.getLogger("CyberTown.Dialogue")
 
 
 class RequestIdConflictError(RuntimeError):
@@ -61,6 +65,7 @@ class DialogueService:
         npc_id: str,
         message: str,
     ) -> DialogueResult:
+        started_at = perf_counter()
         profile = self._npc_service.get_profile(npc_id)
         fingerprint = self._fingerprint(player_id, npc_id, message)
         lock = self._locks[(player_id, npc_id)]
@@ -71,7 +76,9 @@ class DialogueService:
                         connection, client_request_id
                     )
                     if existing:
-                        return self._existing_result(existing, fingerprint, profile)
+                        result = self._existing_result(existing, fingerprint, profile)
+                        self._log_replay(npc_id, started_at)
+                        return result
                     relationship = await self._relationship_repository.get(
                         connection, player_id, npc_id
                     )
@@ -101,7 +108,9 @@ class DialogueService:
                             connection, client_request_id
                         )
                         if existing:
-                            return self._existing_result(existing, fingerprint, profile)
+                            result = self._existing_result(existing, fingerprint, profile)
+                            self._log_replay(npc_id, started_at)
+                            return result
                         await self._dialogue_repository.ensure_player(
                             connection, player_id, now.isoformat()
                         )
@@ -166,6 +175,20 @@ class DialogueService:
                 except Exception as exc:
                     raise PersistenceError("dialogue persistence failed") from exc
 
+                logger.info(
+                    "dialogue completed",
+                    extra={
+                        "details": {
+                            "npc_id": npc_id,
+                            "reply_source": model_result.reply_source,
+                            "duration_ms": round((perf_counter() - started_at) * 1000),
+                            "memory_hits": len(memory_matches),
+                            "memory_saved": memory_saved,
+                            "relationship_rule": decision.rule_id,
+                            "relationship_delta": decision.delta,
+                        }
+                    },
+                )
                 return DialogueResult(
                     request_id=request_id,
                     client_request_id=client_request_id,
@@ -179,9 +202,22 @@ class DialogueService:
                     interaction_tags=model_result.interaction_tags,
                     memory_candidates=model_result.memory_candidates,
                 )
-            except (RequestIdConflictError, aiosqlite.Error):
+            except RequestIdConflictError:
                 raise
-            except OSError as exc:
+            except (PersistenceError, aiosqlite.Error, OSError) as exc:
+                logger.warning(
+                    "dialogue failed",
+                    extra={
+                        "details": {
+                            "npc_id": npc_id,
+                            "duration_ms": round((perf_counter() - started_at) * 1000),
+                            "error_code": "DATABASE_UNAVAILABLE",
+                            "retryable": True,
+                        }
+                    },
+                )
+                if isinstance(exc, PersistenceError):
+                    raise
                 raise PersistenceError("dialogue persistence failed") from exc
 
     async def conversation(self, player_id: str, npc_id: str, limit: int) -> tuple:
@@ -215,6 +251,19 @@ class DialogueService:
             created_at=stored.created_at,
             interaction_tags=stored.interaction_tags,
             memory_candidates=(),
+        )
+
+    @staticmethod
+    def _log_replay(npc_id: str, started_at: float) -> None:
+        logger.info(
+            "dialogue replayed",
+            extra={
+                "details": {
+                    "npc_id": npc_id,
+                    "duration_ms": round((perf_counter() - started_at) * 1000),
+                    "idempotent_replay": True,
+                }
+            },
         )
 
     @staticmethod

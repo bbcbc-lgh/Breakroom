@@ -60,10 +60,21 @@ class OpenAICompatibleDialogueModelClient(BaseDialogueModelClient):
 
     async def generate(self, context: DialogueContext) -> DialogueModelResult:
         started_at = perf_counter()
+        failure_type = ""
         try:
             payload = await self._request(self._messages(context))
             result = self._validated_result(payload, context)
-        except (httpx.HTTPError, IndexError, KeyError, TypeError, ValueError, ValidationError):
+        except httpx.TimeoutException:
+            failure_type = "model_timeout"
+            result = self._fallback(context)
+        except httpx.HTTPStatusError as exc:
+            failure_type = f"model_http_{exc.response.status_code}"
+            result = self._fallback(context)
+        except httpx.RequestError:
+            failure_type = "model_network_error"
+            result = self._fallback(context)
+        except (IndexError, KeyError, TypeError, ValueError, ValidationError):
+            failure_type = "model_invalid_response"
             result = self._fallback(context)
 
         logger.info(
@@ -73,6 +84,7 @@ class OpenAICompatibleDialogueModelClient(BaseDialogueModelClient):
                     "model": self._model_name,
                     "reply_source": result.reply_source,
                     "duration_ms": round((perf_counter() - started_at) * 1000),
+                    "failure_type": failure_type,
                 }
             },
         )

@@ -17,6 +17,8 @@ var pending_request_id := ""
 var api_client: Node
 var last_message := ""
 var session := DialogueSession.new()
+var waiting_timer: Timer
+var waiting_frame := 0
 
 
 func _ready() -> void:
@@ -33,6 +35,8 @@ func configure(client: Node) -> void:
 
 
 func start_dialogue(npc: Node) -> void:
+	if waiting_timer != null:
+		waiting_timer.stop()
 	active_npc = npc
 	active_npc_id = str(npc.profile.get("npc_id", ""))
 	session.open()
@@ -92,22 +96,37 @@ func _build_ui() -> void:
 	var row := HBoxContainer.new()
 	layout.add_child(row)
 	input = LineEdit.new()
+	input.name = "PlayerInput"
 	input.placeholder_text = "输入消息..."
 	input.max_length = 300
 	input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	input.text_submitted.connect(_on_text_submitted)
 	row.add_child(input)
 	send_button = Button.new()
+	send_button.name = "SendButton"
 	send_button.text = "发送"
 	send_button.pressed.connect(_send)
 	row.add_child(send_button)
 	close_button = Button.new()
+	close_button.name = "CloseButton"
 	close_button.text = "关闭"
 	close_button.pressed.connect(close_dialogue)
 	row.add_child(close_button)
+	input.focus_next = input.get_path_to(send_button)
+	input.focus_previous = input.get_path_to(close_button)
+	send_button.focus_next = send_button.get_path_to(close_button)
+	send_button.focus_previous = send_button.get_path_to(input)
+	close_button.focus_next = close_button.get_path_to(input)
+	close_button.focus_previous = close_button.get_path_to(send_button)
+	waiting_timer = Timer.new()
+	waiting_timer.wait_time = 0.35
+	waiting_timer.timeout.connect(_animate_waiting)
+	add_child(waiting_timer)
 
 
 func close_dialogue() -> void:
+	if waiting_timer != null:
+		waiting_timer.stop()
 	session.close()
 	visible = false
 	active_npc = null
@@ -133,6 +152,9 @@ func _send() -> void:
 	if not session.begin_send(pending_request_id):
 		return
 	status_label.text = "正在思考..."
+	waiting_frame = 0
+	waiting_timer.start()
+	send_button.text = "等待"
 	send_button.disabled = true
 	input.editable = false
 	api_client.send_dialogue(active_npc_id, message, pending_request_id)
@@ -164,23 +186,30 @@ func _on_dialogue_received(payload: Dictionary) -> void:
 	if not should_render:
 		return
 	pending_request_id = ""
+	waiting_timer.stop()
 	send_button.disabled = false
 	input.editable = true
 	send_button.text = "发送"
-	input.text = ""
+	var degraded := bool(payload.get("degraded", false))
+	input.text = last_message if degraded else ""
 	var relation: Dictionary = payload.get("relationship", {})
 	relationship_label.text = "关系：%s  (%+d)" % [str(relation.get("level", "陌生")), int(relation.get("delta", 0))]
 	var current := history_label.text
 	if not current.is_empty():
 		current += "\n"
 	history_label.text = current + "[color=#a6b6c9]我[/color]  %s\n[color=#a6b6c9]%s[/color]  %s" % [last_message, npc_name_label.text, str(payload.get("reply", ""))]
-	status_label.text = "已保存。" if payload.get("memory_saved", false) else "已收到回复。"
+	if degraded:
+		status_label.text = "模型暂时不可用，已使用降级回复。可再次发送重试。"
+		send_button.text = "再次尝试"
+	else:
+		status_label.text = "已保存。" if payload.get("memory_saved", false) else "已收到回复。"
 
 
 func _on_dialogue_failed(message: String, request_id: String) -> void:
 	if not visible or request_id != session.pending_request_id:
 		return
 	session.fail()
+	waiting_timer.stop()
 	send_button.disabled = false
 	input.editable = true
 	send_button.text = "重试"
@@ -194,15 +223,20 @@ func _on_conversation_failed(message: String, npc_id: String) -> void:
 	status_label.text = "%s 仍可发送新消息。" % message
 
 
+func _animate_waiting() -> void:
+	waiting_frame = (waiting_frame + 1) % 4
+	status_label.text = "正在思考%s" % ".".repeat(waiting_frame)
+
+
 func _panel_style(fill: Color, border: Color) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = fill
 	style.border_color = border
 	style.set_border_width_all(2)
-	style.corner_radius_top_left = 10
-	style.corner_radius_top_right = 10
-	style.corner_radius_bottom_left = 10
-	style.corner_radius_bottom_right = 10
+	style.corner_radius_top_right = 6
+	style.corner_radius_bottom_left = 6
+	style.corner_radius_bottom_right = 6
+	style.corner_radius_top_left = 6
 	return style
 
 

@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import Mapping
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Any
 
 from CyberTown.Observability.RequestContext import get_request_id
@@ -34,12 +36,29 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(payload, ensure_ascii=False)
 
 
-def configure_logging() -> None:
+def configure_logging(log_dir: Path | None = None) -> None:
     logger = logging.getLogger("CyberTown")
-    if logger.handlers:
-        return
-    handler = logging.StreamHandler()
-    handler.setFormatter(JsonFormatter())
-    logger.addHandler(handler)
+    formatter = JsonFormatter()
+    if not any(isinstance(handler, logging.StreamHandler) for handler in logger.handlers):
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+    if log_dir is not None:
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = (log_dir / "CyberTown.log").resolve()
+        existing_files = {
+            Path(handler.baseFilename).resolve()
+            for handler in logger.handlers
+            if isinstance(handler, logging.FileHandler)
+        }
+        if log_path not in existing_files:
+            file_handler = RotatingFileHandler(
+                log_path,
+                maxBytes=2 * 1024 * 1024,
+                backupCount=2,
+                encoding="utf-8",
+            )
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
     logger.setLevel(logging.INFO)
     logger.propagate = False
