@@ -1,10 +1,10 @@
 extends Node2D
 
-const NPC_SCENE := preload("res://Scenes/NPC.tscn")
-const PLAYER_SCENE := preload("res://Scenes/Player.tscn")
-const DIALOGUE_UI_SCENE := preload("res://Scenes/DialogueUI.tscn")
-const STARTUP_OVERLAY_SCENE := preload("res://Scenes/StartupOverlay.tscn")
-const INTERACTION_PROMPT_SCENE := preload("res://Scenes/InteractionPrompt.tscn")
+const NPC_SCENE := preload("res://Character/NPC.tscn")
+const PLAYER_SCENE := preload("res://Character/Player.tscn")
+const DIALOGUE_UI_SCENE := preload("res://Dialogue/DialogueUI.tscn")
+const STARTUP_OVERLAY_SCENE := preload("res://World/StartupOverlay.tscn")
+const INTERACTION_PROMPT_SCENE := preload("res://Character/InteractionPrompt.tscn")
 
 var player: CharacterBody2D
 var dialogue_ui: CanvasLayer

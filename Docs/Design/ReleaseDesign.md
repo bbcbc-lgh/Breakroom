@@ -68,7 +68,7 @@ Godot 只在退出时终止自己创建且仍存活的后端 PID。若检测到�
 
 ## 6. 构建流程
 
-`Scripts/BuildRelease.ps1` 执行以下步骤并在任一步失败时停止：
+`Build/BuildRelease.ps1` 执行以下步骤并在任一步失败时停止：
 
 1. 检查 Git 工作区和版本号输入。
 2. 创建独立构建临时目录。
@@ -89,7 +89,7 @@ Godot 导出需要 4.7.1 对应的 Windows export template。开发前置检查�
 
 ```powershell
 python -m CyberTown.main --dialogue-mode mock
-D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\HelloAgents\Chapter15\Godot
+D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\HelloAgents\Chapter15\Game
 ```
 
 具体虚拟环境命令和 Python 支持版本在开发计划中锁定，并以实际依赖测试为准。

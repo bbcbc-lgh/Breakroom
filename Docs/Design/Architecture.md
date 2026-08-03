@@ -101,101 +101,48 @@ sequenceDiagram
 
 ```text
 Chapter15/
-|-- .gitignore
-|-- README.md
-|-- REQUIRE.md
-|-- BRIEF.md
-|-- PLAN.md                         # 设计确认后创建
+|-- README.md                       # 开发、验证和发布入口
+|-- Docs/
+|   |-- REQUIRE.md                  # 需求与 AC-01 至 AC-10
+|   |-- BRIEF.md                    # 产品定位和首版范围
+|   |-- PLAN.md                     # 分阶段开发与验收计划
+|   `-- Design/                     # 架构、API、数据、交互和发布设计
 |-- Content/
 |   `-- NPCProfiles.json            # 唯一 NPC 内容源
-|-- Design/
-|   |-- Architecture.md
-|   |-- InteractionDesign.md
-|   |-- APIContract.md
-|   |-- DataModel.md
-|   |-- NPCConfiguration.md
-|   `-- ReleaseDesign.md
-|-- Godot/
+|-- Game/
 |   |-- project.godot
 |   |-- export_presets.cfg
-|   |-- Autoload/
-|   |   |-- GameSession.gd          # 玩家身份、后端模式和启动状态
-|   |   |-- APIClient.gd            # 异步 HTTP、超时、信号和请求映射
-|   |   `-- ContentLoader.gd        # 定位并读取统一 NPC 配置
-|   |-- Scenes/
-|   |   |-- Main.tscn               # 办公室、碰撞、角色实例和 UI 组合
-|   |   |-- Player.tscn             # 玩家移动与碰撞主体
-|   |   |-- NPC.tscn                # 数据驱动 NPC 通用场景
-|   |   |-- DialogueUI.tscn         # 底部对话面板
-|   |   |-- InteractionPrompt.tscn  # 当前目标的交互提示
-|   |   `-- StartupOverlay.tscn     # 后端启动、离线和配置错误状态
-|   |-- Scripts/
-|   |   |-- Main.gd                 # 加载角色、协调场景级事件
-|   |   |-- Player.gd               # 输入、移动、目标选择和交互触发
-|   |   |-- NPC.gd                  # 巡逻、停留、气泡和交互范围
-|   |   |-- DialogueUI.gd           # 对话状态机、输入与渲染
-|   |   |-- InteractionPrompt.gd    # 提示位置和目标切换
-|   |   `-- StartupOverlay.gd       # 启动状态展示与重试
-|   |-- Assets/
-|   |   |-- Characters/             # 原创角色 PNG/SpriteFrames
-|   |   |-- Interior/               # 原创地板、墙体和家具 PNG
-|   |   |-- UI/                     # 图标、九宫格面板和光标
-|   |   |-- Fonts/                  # 随包分发的中文字体及许可证
-|   |   `-- Audio/                  # 后续可替换的环境与交互音效
-|   `-- Tests/
-|       |-- TestRunner.gd           # 无外部插件的 headless 测试入口
-|       `-- InteractionTests.gd     # 目标选择和 UI 状态测试
-|-- backend/
+|   |-- Integration/                # API、后端进程和内容加载
+|   |-- World/                      # 主场景与启动状态，场景和脚本同目录
+|   |-- Character/                  # 玩家、NPC 和交互选择
+|   |-- Dialogue/                   # 对话 UI 与会话状态机
+|   |-- Assets/                     # 角色、室内、UI 和音频素材
+|   `-- Tests/                      # Godot 测试、API 冒烟和截图钩子
+|-- Backend/
 |   |-- pyproject.toml
+|   |-- uv.lock
 |   |-- .env.example
+|   |-- RunBackend.py
 |   |-- CyberTown/
 |   |   |-- main.py                 # FastAPI 应用工厂和命令行入口
 |   |   |-- Config.py               # 环境配置和路径解析
-|   |   |-- API/
-|   |   |   |-- HealthRouter.py     # 健康和运行模式
-|   |   |   |-- NPCRouter.py        # NPC 列表与状态读取
-|   |   |   |-- DialogueRouter.py   # 会话读取和对话提交
-|   |   |   `-- ErrorHandler.py     # 统一公共错误结构
-|   |   |-- Schema/
-|   |   |   |-- HealthSchema.py     # 健康响应 DTO
-|   |   |   |-- NPCSchema.py        # NPC API DTO
-|   |   |   `-- DialogueSchema.py   # 对话请求/响应 DTO
-|   |   |-- Domain/
-|   |   |   |-- NPCProfile.py       # 配置领域对象和约束
-|   |   |   |-- Dialogue.py         # 消息、回复和处理结果
-|   |   |   |-- Relationship.py     # 等级、规则和变化事件
-|   |   |   `-- MemoryEvent.py      # 结构化长期记忆
-|   |   |-- Agent/
-|   |   |   |-- BaseDialogueModelClient.py
-|   |   |   |-- MockDialogueModelClient.py
-|   |   |   |-- OpenAICompatibleDialogueModelClient.py
-|   |   |   |-- NPCContextBuilder.py
-|   |   |   `-- NPCDialogueAgent.py
-|   |   |-- Service/
-|   |   |   |-- NPCService.py       # 配置读取和可展示状态
-|   |   |   |-- DialogueService.py  # 对话用例总编排和幂等
-|   |   |   |-- RelationshipService.py
-|   |   |   `-- MemoryService.py
-|   |   |-- Repository/
-|   |   |   |-- Database.py         # 连接、迁移和事务
-|   |   |   |-- DialogueRepository.py
-|   |   |   |-- RelationshipRepository.py
-|   |   |   `-- MemoryRepository.py
-|   |   |-- Infrastructure/
-|   |   |   `-- NPCConfigLoader.py  # JSON 读取和完整校验
-|   |   `-- Observability/
-|   |       |-- Logging.py          # JSON 日志和脱敏
-|   |       `-- RequestContext.py   # request_id 上下文
-|   `-- tests/
-|       |-- test_api.py
-|       |-- test_dialogue_service.py
-|       |-- test_relationship_service.py
-|       |-- test_memory_service.py
-|       `-- test_npc_config.py
-|-- Scripts/
+|   |   |-- API/                    # HTTP 路由和公共错误
+|   |   |-- Schema/                 # API DTO
+|   |   |-- Domain/                 # 对话、关系、记忆领域类型
+|   |   |-- Agent/                  # 上下文、Mock 和真实模型适配
+|   |   |-- Service/                # 用例编排和稳定业务规则
+|   |   |-- Repository/             # SQLite、迁移和事务
+|   |   |-- Infrastructure/         # NPC 配置读取与校验
+|   |   `-- Observability/          # 日志、脱敏和 request_id
+|   `-- tests/                      # 后端自动化测试
+|-- Build/
 |   |-- BuildRelease.ps1            # 后端冻结、Godot 导出和组装
-|   `-- SmokeTest.ps1               # 发布包健康与启动冒烟
-`-- Release/                        # 生成物，Git 忽略
+|   |-- SmokeTest.ps1               # 发布包健康与启动冒烟
+|   |-- CyberTownBackend.spec       # PyInstaller 配置
+|   |-- Packaging/                  # 用户说明和许可证
+|   `-- Work/                       # 临时构建目录，Git 忽略
+|-- Acceptance/                     # 验收探针、记录和截图
+`-- Release/                        # 最终 Windows 交付物，Git 忽略
 ```
 
 ## 7. 依赖方向

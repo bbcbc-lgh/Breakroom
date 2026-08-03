@@ -21,7 +21,7 @@ def _user_root() -> Path:
 def _env_path() -> Path:
     if getattr(sys, "frozen", False):
         return _user_root() / ".env"
-    return PROJECT_ROOT / "backend" / ".env"
+    return PROJECT_ROOT / "Backend" / ".env"
 
 
 class Settings(BaseSettings):

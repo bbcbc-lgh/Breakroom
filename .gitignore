@@ -1,19 +1,19 @@
 # Secrets and local configuration
-backend/.env
-backend/.env.*
-!backend/.env.example
+Backend/.env
+Backend/.env.*
+!Backend/.env.example
 
 # Python
-backend/.venv/
-backend/venv/
+Backend/.venv/
+Backend/venv/
 __pycache__/
 .pytest_cache/
-backend/.mypy_cache/
+Backend/.mypy_cache/
 .ruff_cache/
 *.py[cod]
 
 # Runtime data and logs
-backend/logs/
+Backend/logs/
 *.db
 *.db-shm
 *.db-wal
@@ -22,11 +22,11 @@ backend/logs/
 *.log
 
 # Godot generated files and exports
-Godot/.godot/
-Godot/export.cfg
-Godot/Tests/capture-*.png
-Godot/Tests/capture-*.png.import
-build/
+Game/.godot/
+Game/export.cfg
+Game/Tests/capture-*.png
+Game/Tests/capture-*.png.import
+Build/Work/
 dist/
 release/
 Release/

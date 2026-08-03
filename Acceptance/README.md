@@ -8,22 +8,34 @@
 
 ## 总结
 
-`AC-01` 至 `AC-10` 全部通过。验收期间发现并修复了 Godot 干净缓存首次解析依赖全局类缓存的问题；`DialogueUI.gd` 与 `Player.gd` 现在显式预加载其脚本依赖。Release 内容未改变，ZIP SHA-256 仍为：
+`AC-01` 至 `AC-10` 全部通过。验收期间发现并修复了 Godot 干净缓存首次解析依赖全局类缓存的问题；`DialogueUI.gd` 与 `Player.gd` 现在显式预加载其脚本依赖。
 
-`8d55d39e370ed7c91e749846ac9c79183b57c6d4de26b98c2d71c30485299e43`
+2026-08-03 按职责重组为 `Docs / Game / Backend / Build` 后执行了完整重建与回归。当前 Release ZIP SHA-256 为：
+
+`00b71243da9f67fa16e02b4f228150c7c3d6c0de05741d305a278f3ed3fe9979`
 
 ## 自动化结果
 
 | 检查 | 命令 | 实际结果 |
 | --- | --- | --- |
-| Ruff | `backend\.venv\Scripts\python.exe -m ruff check --no-cache backend\CyberTown backend\tests backend\RunBackend.py Acceptance\BackendProbe.py` | `All checks passed!` |
-| 后端回归 | `python -m pytest -q -p no:cacheprovider backend\tests`（`PYTHONDONTWRITEBYTECODE=1`） | `73 passed in 5.32s` |
-| Godot 干净导入 | `Godot_v4.7.1-stable_win64_console.exe --headless --import --path Godot` | 5 个 SVG 全部导入，脚本类注册完成，退出码 0 |
-| Godot 测试 | `Godot_v4.7.1-stable_win64_console.exe --headless --path Godot --script res://Tests/TestRunner.gd` | content、movement、collision、interaction、dialogue、health、runtime command、startup layout 全部通过，无脚本或资源错误 |
-| 运行模式探针 | `backend\.venv\Scripts\python.exe Acceptance\BackendProbe.py` | `passed: true`；三 NPC 的 mock、真实模型、fallback 及 SQLite 重启全部通过 |
-| Release 烟测 | `Scripts\SmokeTest.ps1 -ReleaseDirectory Release\CyberTown-v0.1.0-windows-x86_64` | 冻结后端、外部内容、历史、干净 PATH、两次游戏启动、进程清理全部通过 |
+| Ruff | `Backend\.venv\Scripts\python.exe -m ruff check --no-cache Backend\CyberTown Backend\tests Backend\RunBackend.py Acceptance\BackendProbe.py` | `All checks passed!` |
+| 后端回归 | `python -m pytest -q -p no:cacheprovider Backend\tests`（`PYTHONDONTWRITEBYTECODE=1`） | `73 passed in 5.32s` |
+| Godot 干净导入 | `Godot_v4.7.1-stable_win64_console.exe --headless --import --path Game` | 5 个 SVG 全部导入，脚本类注册完成，退出码 0 |
+| Godot 测试 | `Godot_v4.7.1-stable_win64_console.exe --headless --path Game --script res://Tests/TestRunner.gd` | content、movement、collision、interaction、dialogue、health、runtime command、startup layout 全部通过，无脚本或资源错误 |
+| 运行模式探针 | `Backend\.venv\Scripts\python.exe Acceptance\BackendProbe.py` | `passed: true`；三 NPC 的 mock、真实模型、fallback 及 SQLite 重启全部通过 |
+| Release 烟测 | `Build\SmokeTest.ps1 -ReleaseDirectory Release\CyberTown-v0.1.0-windows-x86_64` | 冻结后端、外部内容、历史、干净 PATH、两次游戏启动、进程清理全部通过 |
 | ZIP 扫描 | PowerShell `System.IO.Compression.ZipFile` 扫描 | 91 个条目，禁用项 0；SHA-256 与阶段六一致 |
 | 清理状态 | `Get-Process` 与 `Get-NetTCPConnection -LocalPort 8765` | 相关进程 0，8765 监听 0 |
+
+## 结构重组复验
+
+| 检查 | 实际结果 |
+| --- | --- |
+| 后端 | Ruff 通过，`73 passed in 5.17s` |
+| Godot | 从空 `Game/.godot` 导入成功；完整交互测试通过 |
+| 运行模式 | 三 NPC 的 mock、真实模型和 fallback 全部通过；SQLite 重启与隔离通过 |
+| 完整构建 | `Build/BuildRelease.ps1 -Version 0.1.0 -AllowDirty` 成功完成 PyInstaller、Godot 导出、ZIP 和烟测 |
+| Release | 91 个 ZIP 条目，禁用项 0；相关进程 0，8765 监听 0 |
 
 ## AC 验收矩阵
 
@@ -38,7 +50,7 @@
 | AC-07 | 通过。fallback 探针对三 NPC 均返回 HTTP 200、`reply_source=fallback`、`degraded=true`；Godot 测试覆盖失败后可重试和关闭，移动锁定可恢复。离线 UI 文案与可用控件见 `Screenshots/dialogue-offline-1280x720.png`。 |
 | AC-08 | 通过。pytest 覆盖对话/关系/长期记忆重启恢复、跨 NPC 和跨玩家隔离、事务失败无半条数据；独立探针再次确认 SQLite 重启与跨 NPC 隔离。 |
 | AC-09 | 通过。Ruff、73 项后端测试、Godot 干净导入与场景测试均通过；1280 x 720 与 1600 x 900 的主场景和对话截图均已人工检查，画面非空、文字清晰、控件无越界或重叠。 |
-| AC-10 | 通过。Release 目录烟测扫描及独立 ZIP 扫描均确认不含 `.env`、密钥、日志、SQLite 数据、测试、Python 源码/缓存、Godot 导入缓存；ZIP 91 个条目，禁用项 0。 |
+| AC-10 | 通过。Release 目录烟测扫描及独立 ZIP 扫描均确认不含 `.env`、密钥、日志、SQLite 数据、测试、Python 源码/缓存、Godot 导入缓存；重组后 ZIP 仍为 91 个条目，禁用项 0。 |
 
 ## 截图证据
 

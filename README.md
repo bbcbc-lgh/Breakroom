@@ -5,6 +5,16 @@ Chapter15 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公�
 项目不依赖 Helix，默认 mock 模式无需网络或密钥，也支持 OpenAI Chat Completions
 兼容接口。
 
+## 目录导航
+
+- `Docs/`：需求、产品简报、计划和详细设计。
+- `Content/`：前后端共同读取的唯一 NPC 内容源。
+- `Game/`：Godot 项目，按 Integration、World、Character、Dialogue 功能组织。
+- `Backend/`：FastAPI、Agent、SQLite 和自动化测试。
+- `Build/`：构建脚本、PyInstaller 配置、用户说明和许可证。
+- `Acceptance/`：最终验收探针、运行记录和截图。
+- `Release/`：可直接交付的 Windows 构建，Git 忽略。
+
 ## 当前能力
 
 - Godot 4.7.1 桌面游戏：移动、碰撞、NPC 巡逻、交互提示和异步对话 UI。
@@ -16,19 +26,19 @@ Chapter15 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公�
 
 - Windows x86_64
 - Godot `D:\Godot\Godot_v4.7.1-stable_win64.exe`
-- Python 3.11.15、uv 0.12+（环境位于 `backend/.venv`）
+- Python 3.11.15、uv 0.12+（环境位于 `Backend/.venv`）
 
 首次安装：
 
 ```powershell
-uv sync --project backend --python 3.11
+uv sync --project Backend --python 3.11
 ```
 
 分别启动后端与 Godot 编辑器：
 
 ```powershell
-backend\.venv\Scripts\python.exe backend\RunBackend.py
-D:\Godot\Godot_v4.7.1-stable_win64.exe --editor --path Godot
+Backend\.venv\Scripts\python.exe Backend\RunBackend.py
+D:\Godot\Godot_v4.7.1-stable_win64.exe --editor --path Game
 ```
 
 后端健康检查为 `http://127.0.0.1:8765/health`。在编辑器中直接运行游戏时，
@@ -36,7 +46,7 @@ D:\Godot\Godot_v4.7.1-stable_win64.exe --editor --path Godot
 
 ## 配置
 
-开发环境读取被 Git 忽略的 `backend/.env`；发布版读取
+开发环境读取被 Git 忽略的 `Backend/.env`；发布版读取
 `%APPDATA%\CyberTown\.env`。默认不需要配置。启用真实模型时写入：
 
 ```dotenv
@@ -55,9 +65,9 @@ NPC 内容只编辑 `Content/NPCProfiles.json`。修改显示名称或性格后�
 ## 验证
 
 ```powershell
-backend\.venv\Scripts\python.exe -m ruff check backend\CyberTown backend\tests backend\RunBackend.py
-backend\.venv\Scripts\python.exe -m pytest -q backend\tests
-D:\Godot\Godot_v4.7.1-stable_win64.exe --headless --path Godot --script res://Tests/TestRunner.gd
+Backend\.venv\Scripts\python.exe -m ruff check Backend\CyberTown Backend\tests Backend\RunBackend.py
+Backend\.venv\Scripts\python.exe -m pytest -q Backend\tests
+D:\Godot\Godot_v4.7.1-stable_win64.exe --headless --path Game --script res://Tests/TestRunner.gd
 ```
 
 ## Windows 发布
@@ -65,7 +75,7 @@ D:\Godot\Godot_v4.7.1-stable_win64.exe --headless --path Godot --script res://Te
 先安装 Godot 4.7.1 Windows export templates，然后执行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File Scripts\BuildRelease.ps1 -Version 0.1.0
+powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 -Version 0.1.0
 ```
 
 脚本运行后端检查和测试、冻结后端、导出 Godot、扫描发布内容，并在精简 PATH

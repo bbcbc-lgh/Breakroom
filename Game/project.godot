@@ -3,14 +3,14 @@ config_version=5
 [application]
 
 config/name="AI小镇"
-run/main_scene="res://Scenes/Main.tscn"
+run/main_scene="res://World/Main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
-ContentLoader="*res://Autoload/ContentLoader.gd"
-BackendProcessManager="*res://Scripts/BackendProcessManager.gd"
-APIClient="*res://Scripts/APIClient.gd"
+ContentLoader="*res://Integration/ContentLoader.gd"
+BackendProcessManager="*res://Integration/BackendProcessManager.gd"
+APIClient="*res://Integration/APIClient.gd"
 
 [display]
 

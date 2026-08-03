@@ -3,7 +3,7 @@ extends CharacterBody2D
 signal interaction_requested(npc: Node)
 signal target_changed(npc: Node)
 
-const INTERACTION_SELECTOR = preload("res://Scripts/InteractionSelector.gd")
+const INTERACTION_SELECTOR = preload("res://Character/InteractionSelector.gd")
 const SPEED := 190.0
 var interacting := false
 var nearby_npcs: Array[Node] = []

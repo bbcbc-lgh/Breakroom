@@ -8,8 +8,9 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $root = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
-$backendRoot = Join-Path $root 'backend'
-$godotRoot = Join-Path $root 'Godot'
+$backendRoot = Join-Path $root 'Backend'
+$godotRoot = Join-Path $root 'Game'
+$packagingRoot = Join-Path $PSScriptRoot 'Packaging'
 $python = Join-Path $backendRoot '.venv\Scripts\python.exe'
 $templateRoot = Join-Path $env:APPDATA 'Godot\export_templates\4.7.1.stable'
 $godotCli = $GodotPath
@@ -20,7 +21,7 @@ if (-not $GodotPath.EndsWith('_console.exe', [System.StringComparison]::OrdinalI
 $releaseName = "CyberTown-v$Version-windows-x86_64"
 $releaseBase = Join-Path $root 'Release'
 $releaseRoot = Join-Path $releaseBase $releaseName
-$buildRoot = Join-Path $root "build\release-$Version"
+$buildRoot = Join-Path $PSScriptRoot "Work\release-$Version"
 $backendDist = Join-Path $buildRoot 'backend-dist'
 $backendWork = Join-Path $buildRoot 'backend-work'
 $zipPath = Join-Path $releaseBase "$releaseName.zip"
@@ -36,7 +37,7 @@ foreach ($required in @($GodotPath, $godotCli, $python, (Join-Path $godotRoot 'e
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) { throw "Missing build prerequisite: $required" }
 }
 foreach ($packagingFile in @('README.txt', 'LICENSES\Godot.txt', 'LICENSES\Font.txt', 'LICENSES\ThirdParty.txt')) {
-    $packagingPath = Join-Path (Join-Path $root 'Packaging') $packagingFile
+    $packagingPath = Join-Path $packagingRoot $packagingFile
     if (-not (Test-Path -LiteralPath $packagingPath -PathType Leaf)) {
         throw "Missing packaging file: $packagingPath"
     }
@@ -64,7 +65,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Ruff failed.' }
     & $python -m pytest -q
     if ($LASTEXITCODE -ne 0) { throw 'Backend tests failed.' }
-    & $python -m PyInstaller --noconfirm --clean --distpath $backendDist --workpath $backendWork (Join-Path $backendRoot 'CyberTownBackend.spec')
+    & $python -m PyInstaller --noconfirm --clean --distpath $backendDist --workpath $backendWork (Join-Path $PSScriptRoot 'CyberTownBackend.spec')
     if ($LASTEXITCODE -ne 0) { throw 'PyInstaller build failed.' }
 }
 finally {
@@ -85,8 +86,8 @@ foreach ($artifact in @('CyberTown.exe', 'CyberTown.pck')) {
 
 New-Item -ItemType Directory -Path (Join-Path $releaseRoot 'Content') | Out-Null
 Copy-Item -LiteralPath (Join-Path $root 'Content\NPCProfiles.json') -Destination (Join-Path $releaseRoot 'Content\NPCProfiles.json')
-Copy-Item -LiteralPath (Join-Path $root 'Packaging\README.txt') -Destination (Join-Path $releaseRoot 'README.txt')
-Copy-Item -LiteralPath (Join-Path $root 'Packaging\LICENSES') -Destination (Join-Path $releaseRoot 'LICENSES') -Recurse
+Copy-Item -LiteralPath (Join-Path $packagingRoot 'README.txt') -Destination (Join-Path $releaseRoot 'README.txt')
+Copy-Item -LiteralPath (Join-Path $packagingRoot 'LICENSES') -Destination (Join-Path $releaseRoot 'LICENSES') -Recurse
 
 & (Join-Path $PSScriptRoot 'SmokeTest.ps1') -ReleaseDirectory $releaseRoot
 if ($LASTEXITCODE -ne 0) { throw 'Release smoke test failed.' }

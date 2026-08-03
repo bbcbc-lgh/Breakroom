@@ -2,7 +2,8 @@ from pathlib import Path
 
 from PyInstaller.utils.hooks import collect_submodules
 
-backend_root = Path(SPECPATH)
+project_root = Path(SPECPATH).parent
+backend_root = project_root / "Backend"
 
 a = Analysis(
     [str(backend_root / "RunBackend.py")],

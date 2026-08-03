@@ -30,10 +30,10 @@ func _exit_tree() -> void:
 func _backend_command() -> PackedStringArray:
 	if OS.has_feature("editor"):
 		var root := ProjectSettings.globalize_path("res://..").simplify_path()
-		var python := root.path_join("backend/.venv/Scripts/pythonw.exe")
+		var python := root.path_join("Backend/.venv/Scripts/pythonw.exe")
 		if not FileAccess.file_exists(python):
-			python = root.path_join("backend/.venv/Scripts/python.exe")
-		var launcher := root.path_join("backend/RunBackend.py")
+			python = root.path_join("Backend/.venv/Scripts/python.exe")
+		var launcher := root.path_join("Backend/RunBackend.py")
 		if not FileAccess.file_exists(python) or not FileAccess.file_exists(launcher):
 			return PackedStringArray()
 		return PackedStringArray([python, launcher])

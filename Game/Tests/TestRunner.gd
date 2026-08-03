@@ -1,10 +1,10 @@
 extends SceneTree
 
-const INTERACTION_SELECTOR = preload("res://Scripts/InteractionSelector.gd")
-const DIALOGUE_SESSION = preload("res://Scripts/DialogueSession.gd")
-const DIALOGUE_UI_SCENE = preload("res://Scenes/DialogueUI.tscn")
-const STARTUP_OVERLAY_SCENE = preload("res://Scenes/StartupOverlay.tscn")
-const PLAYER_SCENE = preload("res://Scenes/Player.tscn")
+const INTERACTION_SELECTOR = preload("res://Character/InteractionSelector.gd")
+const DIALOGUE_SESSION = preload("res://Dialogue/DialogueSession.gd")
+const DIALOGUE_UI_SCENE = preload("res://Dialogue/DialogueUI.tscn")
+const STARTUP_OVERLAY_SCENE = preload("res://World/StartupOverlay.tscn")
+const PLAYER_SCENE = preload("res://Character/Player.tscn")
 
 
 class FakeAPIClient:
@@ -61,7 +61,7 @@ func _run() -> void:
 
 
 func _test_content_loader() -> void:
-	var loader_script = load("res://Autoload/ContentLoader.gd")
+	var loader_script = load("res://Integration/ContentLoader.gd")
 	var loader = loader_script.new()
 	if not loader.load_profiles():
 		failures.append("content loader could not read NPC profiles")

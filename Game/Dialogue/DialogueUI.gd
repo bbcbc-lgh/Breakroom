@@ -2,7 +2,7 @@ extends CanvasLayer
 
 signal closed
 
-const DIALOGUE_SESSION = preload("res://Scripts/DialogueSession.gd")
+const DIALOGUE_SESSION = preload("res://Dialogue/DialogueSession.gd")
 
 var panel: Panel
 var npc_name_label: Label

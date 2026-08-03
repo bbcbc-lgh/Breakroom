@@ -58,7 +58,7 @@
 | 樊玥燚 | 产品策划 | 追问目标、用户和取舍，推动玩家说清想法 |
 | 胡佳烙 | 视觉与交互设计师 | 从视觉、交互和创意角度给出具体观察 |
 
-三名角色的详细内容以 `Content/NPCProfiles.json` 为唯一可编辑来源。设计定义见 [NPCConfiguration.md](./Design/NPCConfiguration.md)。
+三名角色的详细内容以 `Content/NPCProfiles.json` 为唯一可编辑来源。实际路径为 `../Content/NPCProfiles.json`，设计定义见 [NPCConfiguration.md](./Design/NPCConfiguration.md)。
 
 三名角色均为原创虚构形象，不对应、不模仿任何真实人物外貌；姓名只作为游戏角色名称使用。
 

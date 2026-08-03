@@ -17,7 +17,7 @@
 | 工具 | 固定选择 | 原因 |
 | --- | --- | --- |
 | Python | uv 管理的 CPython 3.11.15 | 本机已存在，依赖兼容面稳定，不使用系统 3.14.6 冒险 |
-| Python 环境 | `backend/.venv` | 与其他章节隔离，已由 Git 忽略 |
+| Python 环境 | `Backend/.venv` | 与其他章节隔离，已由 Git 忽略 |
 | 包管理 | uv 0.12.0 + `uv.lock` | 可复现安装与冻结构建 |
 | 后端 | FastAPI + Uvicorn | 满足本地 HTTP API 与 OpenAPI 需求 |
 | 数据 | stdlib SQLite + aiosqlite | 不引入 ORM，保留清晰事务边界 |
@@ -35,7 +35,7 @@
 
 ## 3. 全程约束
 
-- 不读取、打印、复制或提交 `backend/.env`。
+- 不读取、打印、复制或提交 `Backend/.env`。
 - 不新增 Python `__init__.py`；使用 namespace package 导入。
 - 不依赖或复制 `Chapter11/Helix`，只实现已批准的 Chapter15 边界。
 - 不实现首版范围外的 Qdrant、Neo4j、任务、多场景、多人或管理后台。
@@ -50,7 +50,7 @@
 
 - 按批准的目标目录迁移当前空骨架，使用 PascalCase 能力目录和文件名。
 - 删除被新结构取代的空文件；不删除任何包含用户内容的文件。
-- 创建 `backend/pyproject.toml`、`uv.lock` 和 Python 3.11 `.venv`。
+- 创建 `Backend/pyproject.toml`、`uv.lock` 和 Python 3.11 `.venv`。
 - 建立最小 FastAPI 应用工厂、配置加载和测试框架。
 - 调整 Godot 项目为 1280 x 720、像素纹理最近邻过滤和明确的输入映射。
 - 创建 `Content/NPCProfiles.json`，写入三名默认虚构角色并完成双端最小校验。
@@ -61,8 +61,8 @@
 ```powershell
 uv sync --project backend --python 3.11
 uv run --project backend ruff check backend
-uv run --project backend pytest -q backend/tests
-D:\Godot\Godot_v4.7.1-stable_win64_console.exe --headless --path Godot --editor --quit
+uv run --project Backend pytest -q Backend/tests
+D:\Godot\Godot_v4.7.1-stable_win64_console.exe --headless --path Game --editor --quit
 ```
 
 ### 阻塞门
@@ -168,7 +168,7 @@ D:\Godot\Godot_v4.7.1-stable_win64_console.exe --headless --path Godot --editor 
 - `base_url`。
 - API Key、模型名和 base URL 对应的环境变量名称。
 
-密钥由用户自行保存在已忽略的 `backend/.env` 或系统环境变量中。
+密钥由用户自行保存在已忽略的 `Backend/.env` 或系统环境变量中。
 
 ### 范围
 

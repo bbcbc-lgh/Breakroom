@@ -11,7 +11,7 @@ import httpx
 from pydantic import SecretStr
 
 CHAPTER_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(CHAPTER_ROOT / "backend"))
+sys.path.insert(0, str(CHAPTER_ROOT / "Backend"))
 
 from CyberTown.Config import Settings, get_settings
 from CyberTown.main import create_app
