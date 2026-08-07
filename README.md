@@ -2,7 +2,7 @@
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-第十五章 CyberTown 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
+CyberTown 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
 与张旭、樊玥燚、胡佳烙对话；对话历史、关系和长期记忆保存在本地 SQLite。
 项目不依赖 Helix，默认 mock 模式无需网络或密钥，也支持 OpenAI Chat Completions
 兼容接口。
