@@ -1,5 +1,7 @@
 # 赛博小镇（Cyber Town）
 
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 第十五章 CyberTown 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
 与张旭、樊玥燚、胡佳烙对话；对话历史、关系和长期记忆保存在本地 SQLite。
 项目不依赖 Helix，默认 mock 模式无需网络或密钥，也支持 OpenAI Chat Completions
@@ -90,3 +92,7 @@ powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 -Version 0.1.0
 
 当前仅包含 Windows x86_64、单人、一个办公室场景和 SQLite。Qdrant、Neo4j、
 多人、任务系统、游戏内 NPC 编辑器均不在首版范围。
+
+## 许可证
+
+本项目基于 [MIT License](LICENSE) 开源。
