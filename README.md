@@ -1,55 +1,54 @@
-# 赛博小镇（Cyber Town）
+# Cyber Town
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-CyberTown 的 Windows 2D 像素风 AI NPC 架构原型。玩家在原创办公室场景中移动，
-与张旭、樊玥燚、胡佳烙对话；对话历史、关系和长期记忆保存在本地 SQLite。
-项目不依赖 Helix，默认 mock 模式无需网络或密钥，也支持 OpenAI Chat Completions
-兼容接口。
+Cyber Town 是一个 Windows x86_64 俯视角像素游戏原型：玩家可以在办公室中移动，和拥有独立人格、关系与持续记忆的 NPC 对话。游戏由 Godot 驱动，FastAPI 后端负责对话、关系和记忆；默认使用本地 mock 回复，不需要 API Key。
 
-## 目录导航
+> 当前状态：首版原型，目标平台为 Windows x86_64。发布包和运行数据不提交到 Git。
 
-- `Docs/`：需求、产品简报、计划和详细设计。
-- `Content/`：前后端共同读取的唯一 NPC 内容源。
-- `Game/`：Godot 项目，按 Integration、World、Character、Dialogue 功能组织。
-- `Backend/`：FastAPI、Agent、SQLite 和自动化测试。
-- `Build/`：构建脚本、PyInstaller 配置、用户说明和许可证。
-- `Acceptance/`：最终验收探针、运行记录和截图。
-- `Release/`：可直接交付的 Windows 构建，Git 忽略。
+## 先试试看
 
-## 当前能力
+如果只想运行游戏，请从仓库的 [Releases](../../releases) 下载最新 Windows 压缩包，解压后双击 `CyberTown.exe`。发布包不要求安装 Python、Godot 或模型服务。
 
-- Godot 4.7.1 桌面游戏：移动、碰撞、NPC 巡逻、交互提示和异步对话 UI。
-- FastAPI 后端：角色化回复、确定性关系规则、结构化记忆、幂等请求和脱敏日志。
-- `Content/NPCProfiles.json` 统一配置 NPC 的稳定 ID、姓名、性格、外观和场景参数。
-- PyInstaller one-folder 后端与 Godot Windows 发布包，不要求玩家安装开发工具。
+操作：使用 `WASD` 或方向键移动，靠近 NPC 后按 `E` 交互；在对话框中按 `Enter` 发送，按 `Esc` 关闭。
 
-## 开发环境
+## 本地开发
+
+### 环境要求
 
 - Windows x86_64
-- Godot `D:\Godot\Godot_v4.7.1-stable_win64.exe`
-- Python 3.11.15、uv 0.12+（环境位于 `Backend/.venv`）
+- [Godot 4.7.1](https://godotengine.org/download/archive/4.7.1-stable/)（开发和导出使用同一版本）
+- Python 3.11
+- [uv](https://docs.astral.sh/uv/)
 
-首次安装：
+### 安装与启动
+
+在仓库根目录执行：
 
 ```powershell
 uv sync --project Backend --python 3.11
+Backend\.venv\Scripts\python.exe Backend\RunBackend.py
 ```
 
-分别启动后端与 Godot 编辑器：
+另开一个终端启动 Godot 编辑器：
 
 ```powershell
-Backend\.venv\Scripts\python.exe Backend\RunBackend.py
-D:\Godot\Godot_v4.7.1-stable_win64.exe --editor --path Game
+godot --editor --path Game
 ```
 
-后端健康检查为 `http://127.0.0.1:8765/health`。在编辑器中直接运行游戏时，
-游戏也会尝试启动并管理当前项目的后端子进程。
+如果 `godot` 不在 PATH 中，将它替换为本机 Godot 可执行文件路径。后端启动后可访问 <http://127.0.0.1:8765/health> 检查状态；在编辑器中运行游戏时，游戏也会尝试自动启动和管理后端子进程。
 
-## 配置
+## 常见修改
 
-开发环境读取被 Git 忽略的 `Backend/.env`；发布版读取
-`%APPDATA%\CyberTown\.env`。默认不需要配置。启用真实模型时写入：
+### 修改 NPC 内容
+
+编辑 [`Content/NPCProfiles.json`](Content/NPCProfiles.json)，保存后重启游戏即可生效。可以修改姓名、职业、性格和说话风格等字段。
+
+请保留已有的 `npc_id`：它是历史对话、关系和记忆的稳定关联键。字段定义和校验规则见 [`Docs/Design/NPCConfiguration.md`](Docs/Design/NPCConfiguration.md)。
+
+### 启用真实模型（可选）
+
+开发环境使用被 Git 忽略的 `Backend/.env`。复制 [`Backend/.env.example`](Backend/.env.example) 后填写以下配置：
 
 ```dotenv
 CYBER_TOWN_MODEL_BASE_URL=https://your-provider.example/v1
@@ -58,40 +57,69 @@ CYBER_TOWN_MODEL_API_KEY=your-api-key
 CYBER_TOWN_MODEL_TIMEOUT_SECONDS=15
 ```
 
-兼容别名为 `LLM_BASE_URL`、`LLM_MODEL_ID`、`LLM_API_KEY`。Base URL、模型名和
-API Key 必须同时存在，否则自动回退到 mock。不要提交 `.env`。
+Base URL、模型名和 API Key 必须同时存在，否则自动回退到 mock。不要提交 `.env` 或 API Key。发布版的配置文件位置为 `%APPDATA%\CyberTown\.env`。
 
-NPC 内容只编辑 `Content/NPCProfiles.json`。修改显示名称或性格后重启即可生效；
-保留原 `npc_id` 可继续关联既有历史、关系和记忆。
+兼容变量名为 `LLM_BASE_URL`、`LLM_MODEL_ID` 和 `LLM_API_KEY`。本地日志位于 `%APPDATA%\CyberTown\Logs\CyberTown.log`，对话数据库位于 `%APPDATA%\CyberTown\Data\CyberTown.db`。
 
-## 验证
+## 验证改动
+
+提交前建议运行完整检查：
 
 ```powershell
 Backend\.venv\Scripts\python.exe -m ruff check Backend\src Backend\tests Backend\RunBackend.py
 Backend\.venv\Scripts\python.exe -m pytest -q Backend\tests
-D:\Godot\Godot_v4.7.1-stable_win64.exe --headless --path Game --script res://Tests/TestRunner.gd
+godot --headless --path Game --script res://Tests/TestRunner.gd
 ```
 
-## Windows 发布
+若 Godot 不在 PATH 中，同样替换为本机可执行文件路径。
 
-先安装 Godot 4.7.1 Windows export templates，然后执行：
+## 构建 Windows 发布包
+
+先安装 Godot 4.7.1 的 Windows export templates，然后执行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 -Version 0.1.0
+powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 `
+  -Version 0.1.0 `
+  -GodotPath 'C:\Path\To\Godot_v4.7.1-stable_win64.exe'
 ```
 
-脚本运行后端检查和测试、冻结后端、导出 Godot、扫描发布内容，并在精简 PATH
-下完成两次启动/退出冒烟。输出位于 `Release/CyberTown-v0.1.0-windows-x86_64`，
-同时生成 ZIP 与 `.sha256`。开发中的脏工作区需要显式加 `-AllowDirty`；正式发布
-应从干净提交构建。
+脚本会依次运行 Ruff、pytest、PyInstaller、Godot 导出和发布包冒烟测试，并生成：
 
-最终用户说明位于发布包的 `README.txt`。本地数据和日志位于
-`%APPDATA%\CyberTown`，不会写入发布目录。
+- `Release/CyberTown-v0.1.0-windows-x86_64/`
+- 对应 ZIP 压缩包
+- `.sha256` 校验文件
 
-## 首版边界
+脚本默认要求 Git 工作区干净；本地开发验证可以明确传入 `-AllowDirty`。发布包内的玩家说明位于 `README.txt`。
 
-当前仅包含 Windows x86_64、单人、一个办公室场景和 SQLite。Qdrant、Neo4j、
-多人、任务系统、游戏内 NPC 编辑器均不在首版范围。
+## 项目结构
+
+| 路径 | 用途 |
+| --- | --- |
+| `Game/` | Godot 游戏、场景、角色、对话 UI 和 Godot 测试 |
+| `Backend/` | FastAPI 服务、对话 Agent、SQLite 持久化和 Python 测试 |
+| `Content/` | 前后端共享的 NPC 配置源 |
+| `Build/` | PyInstaller、Windows 导出和发布包脚本 |
+| `Acceptance/` | 验收探针、运行记录和截图 |
+| `Docs/` | 需求、架构、API 契约和设计文档 |
+
+更详细的边界和接口说明：[`Docs/Design/Architecture.md`](Docs/Design/Architecture.md)、[`Docs/Design/APIContract.md`](Docs/Design/APIContract.md)。
+
+## 遇到问题
+
+- 8765 端口被占用时，关闭占用程序后重试启动。
+- 后端无法连接模型服务时会自动降级到 mock，游戏仍可继续运行。
+- 启动和对话日志位于 `%APPDATA%\CyberTown\Logs\CyberTown.log`；提交 Issue 时请附上复现步骤和相关日志片段，并先移除 API Key 等敏感信息。
+
+## 参与开发
+
+欢迎提交 Issue 和 Pull Request。提交前请：
+
+1. 说明问题的复现步骤，或清楚描述改动解决的用户场景。
+2. 为行为变化补充或更新测试。
+3. 运行上面的 Ruff、pytest 和 Godot headless 检查。
+4. 不提交 `.env`、密钥、`Backend/.venv`、`.godot` 缓存或本地发布产物。
+
+首版明确暂不包含：多人、任务系统、游戏内 NPC 编辑器、Qdrant、Neo4j，以及 Windows 以外的平台支持。
 
 ## 许可证
 
