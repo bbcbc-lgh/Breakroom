@@ -14,7 +14,7 @@ def test_settings_use_safe_local_defaults() -> None:
     assert settings.content_path == PROJECT_ROOT / "Content" / "NPCProfiles.json"
     assert settings.data_dir.name == "Data"
     assert settings.log_dir.name == "Logs"
-    assert settings.database_path == settings.data_dir / "CyberTown.db"
+    assert settings.database_path == settings.data_dir / "Breakroom.db"
 
 
 def test_settings_accept_explicit_content_path(tmp_path: Path) -> None:
@@ -60,4 +60,39 @@ def test_frozen_backend_reads_user_env(monkeypatch) -> None:
     monkeypatch.setattr("src.Config.sys.frozen", True, raising=False)
     monkeypatch.setenv("APPDATA", "C:/Users/test/AppData/Roaming")
 
-    assert _env_path() == Path("C:/Users/test/AppData/Roaming/CyberTown/.env")
+    assert _env_path() == Path("C:/Users/test/AppData/Roaming/Breakroom/.env")
+
+
+def test_legacy_user_data_is_migrated(monkeypatch, tmp_path: Path) -> None:
+    appdata = tmp_path / "Roaming"
+    legacy_data = appdata / "CyberTown" / "Data"
+    legacy_logs = appdata / "CyberTown" / "Logs"
+    legacy_data.mkdir(parents=True)
+    legacy_logs.mkdir(parents=True)
+    (legacy_data / "CyberTown.db").write_bytes(b"legacy-db")
+    (legacy_logs / "CyberTown.log").write_text("legacy-log", encoding="utf-8")
+    monkeypatch.setenv("APPDATA", str(appdata))
+    monkeypatch.setenv("LOCALAPPDATA", str(appdata))
+
+    settings = Settings()
+
+    assert settings.data_dir == appdata / "Breakroom" / "Data"
+    assert (settings.data_dir / "Breakroom.db").read_bytes() == b"legacy-db"
+    log_path = appdata / "Breakroom" / "Logs" / "Breakroom.log"
+    assert log_path.read_text(encoding="utf-8") == "legacy-log"
+    assert not (appdata / "CyberTown").exists()
+
+
+def test_existing_user_data_is_not_overwritten(monkeypatch, tmp_path: Path) -> None:
+    appdata = tmp_path / "Roaming"
+    (appdata / "Breakroom" / "Data").mkdir(parents=True)
+    (appdata / "Breakroom" / "Data" / "Breakroom.db").write_bytes(b"current-db")
+    (appdata / "CyberTown" / "Data").mkdir(parents=True)
+    (appdata / "CyberTown" / "Data" / "CyberTown.db").write_bytes(b"legacy-db")
+    monkeypatch.setenv("APPDATA", str(appdata))
+
+    settings = Settings()
+
+    assert (settings.data_dir / "Breakroom.db").read_bytes() == b"current-db"
+    legacy_db = appdata / "CyberTown" / "Data" / "CyberTown.db"
+    assert legacy_db.read_bytes() == b"legacy-db"

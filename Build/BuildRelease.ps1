@@ -18,7 +18,7 @@ if (-not $GodotPath.EndsWith('_console.exe', [System.StringComparison]::OrdinalI
     $consoleCandidate = $GodotPath.Substring(0, $GodotPath.Length - 4) + '_console.exe'
     if (Test-Path -LiteralPath $consoleCandidate -PathType Leaf) { $godotCli = $consoleCandidate }
 }
-$releaseName = "CyberTown-v$Version-windows-x86_64"
+$releaseName = "Breakroom-v$Version-windows-x86_64"
 $releaseBase = Join-Path $root 'Release'
 $releaseRoot = Join-Path $releaseBase $releaseName
 $buildRoot = Join-Path $PSScriptRoot "Work\release-$Version"
@@ -65,22 +65,22 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Ruff failed.' }
     & $python -m pytest -q
     if ($LASTEXITCODE -ne 0) { throw 'Backend tests failed.' }
-    & $python -m PyInstaller --noconfirm --clean --distpath $backendDist --workpath $backendWork (Join-Path $PSScriptRoot 'CyberTownBackend.spec')
+    & $python -m PyInstaller --noconfirm --clean --distpath $backendDist --workpath $backendWork (Join-Path $PSScriptRoot 'BreakroomBackend.spec')
     if ($LASTEXITCODE -ne 0) { throw 'PyInstaller build failed.' }
 }
 finally {
     Pop-Location
 }
 
-$frozenBackend = Join-Path $backendDist 'CyberTownBackend'
-if (-not (Test-Path -LiteralPath (Join-Path $frozenBackend 'CyberTownBackend.exe'))) { throw 'Frozen backend executable is missing.' }
+$frozenBackend = Join-Path $backendDist 'BreakroomBackend'
+if (-not (Test-Path -LiteralPath (Join-Path $frozenBackend 'BreakroomBackend.exe'))) { throw 'Frozen backend executable is missing.' }
 Copy-Item -LiteralPath $frozenBackend -Destination (Join-Path $releaseRoot 'Backend') -Recurse
 
 & $godotCli --headless --path $godotRoot --import
 if ($LASTEXITCODE -ne 0) { throw 'Godot import failed.' }
-& $godotCli --headless --path $godotRoot --export-release 'Windows Desktop' (Join-Path $releaseRoot 'CyberTown.exe')
+& $godotCli --headless --path $godotRoot --export-release 'Windows Desktop' (Join-Path $releaseRoot 'Breakroom.exe')
 if ($LASTEXITCODE -ne 0) { throw 'Godot export failed.' }
-foreach ($artifact in @('CyberTown.exe', 'CyberTown.pck')) {
+foreach ($artifact in @('Breakroom.exe', 'Breakroom.pck')) {
     if (-not (Test-Path -LiteralPath (Join-Path $releaseRoot $artifact))) { throw "Godot artifact is missing: $artifact" }
 }
 

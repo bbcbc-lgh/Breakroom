@@ -154,7 +154,7 @@ class _ImmediateJsonHandler(logging.Handler):
 
 async def test_request_id_correlates_dialogue_and_http_logs(tmp_path: Path) -> None:
     app = create_app(Settings(dialogue_mode="mock", data_dir=tmp_path / str(uuid4())))
-    logger = logging.getLogger("CyberTown")
+    logger = logging.getLogger("Breakroom")
     previous_level = logger.level
     logger.setLevel(logging.INFO)
     handler = _ImmediateJsonHandler()

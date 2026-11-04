@@ -38,7 +38,7 @@ func _backend_command() -> PackedStringArray:
 			return PackedStringArray()
 		return PackedStringArray([python, launcher])
 	var executable_root := OS.get_executable_path().get_base_dir()
-	var backend := executable_root.path_join("Backend/CyberTownBackend.exe")
+	var backend := executable_root.path_join("Backend/BreakroomBackend.exe")
 	var content := executable_root.path_join("Content/NPCProfiles.json")
 	if not FileAccess.file_exists(backend) or not FileAccess.file_exists(content):
 		return PackedStringArray()

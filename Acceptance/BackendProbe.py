@@ -162,7 +162,7 @@ def _passed(records: list[dict]) -> bool:
 
 async def main() -> int:
     records = []
-    with tempfile.TemporaryDirectory(prefix="cyber-town-acceptance-") as temp:
+    with tempfile.TemporaryDirectory(prefix="breakroom-acceptance-") as temp:
         root = Path(temp)
         records.append(
             await _probe_mode(

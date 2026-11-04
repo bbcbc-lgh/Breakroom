@@ -1,5 +1,7 @@
 # CyberTown（第十五章）阶段七验收记录
 
+> 2026-11：项目已更名为 Breakroom（茶水间）。本文是当时的验收存档，路径、产物名和提交信息保留原文。
+
 验收时间：2026-08-03（Asia/Shanghai）
 
 基线提交：`ed13be9 build: package Windows CyberTown prototype`

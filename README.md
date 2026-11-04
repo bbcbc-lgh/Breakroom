@@ -1,14 +1,16 @@
-# Cyber Town
+# Breakroom
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-Cyber Town 是一个 Windows x86_64 俯视角像素游戏原型：玩家可以在办公室中移动，和拥有独立人格、关系与持续记忆的 NPC 对话。游戏由 Godot 驱动，FastAPI 后端负责对话、关系和记忆；默认使用本地 mock 回复，不需要 API Key。
+Breakroom（茶水间）是一个 Windows x86_64 俯视角像素游戏原型：玩家可以在办公室中移动，和拥有独立人格、关系与持续记忆的 NPC 对话。游戏由 Godot 驱动，FastAPI 后端负责对话、关系和记忆；默认使用本地 mock 回复，不需要 API Key。
 
 > 当前状态：首版原型，目标平台为 Windows x86_64。发布包和运行数据不提交到 Git。
+>
+> 从旧版本 CyberTown 升级时，`%APPDATA%\CyberTown` 会在首次启动时自动迁移为 `%APPDATA%\Breakroom`，不需要手动搬数据。
 
 ## 先试试看
 
-如果只想运行游戏，请从仓库的 [Releases](../../releases) 下载最新 Windows 压缩包，解压后双击 `CyberTown.exe`。发布包不要求安装 Python、Godot 或模型服务。
+如果只想运行游戏，请从仓库的 [Releases](../../releases) 下载最新 Windows 压缩包，解压后双击 `Breakroom.exe`。发布包不要求安装 Python、Godot 或模型服务。
 
 操作：使用 `WASD` 或方向键移动，靠近 NPC 后按 `E` 交互；在对话框中按 `Enter` 发送，按 `Esc` 关闭。
 
@@ -51,15 +53,15 @@ godot --editor --path Game
 开发环境使用被 Git 忽略的 `Backend/.env`。复制 [`Backend/.env.example`](Backend/.env.example) 后填写以下配置：
 
 ```dotenv
-CYBER_TOWN_MODEL_BASE_URL=https://your-provider.example/v1
-CYBER_TOWN_MODEL_NAME=your-model-name
-CYBER_TOWN_MODEL_API_KEY=your-api-key
-CYBER_TOWN_MODEL_TIMEOUT_SECONDS=15
+BREAKROOM_MODEL_BASE_URL=https://your-provider.example/v1
+BREAKROOM_MODEL_NAME=your-model-name
+BREAKROOM_MODEL_API_KEY=your-api-key
+BREAKROOM_MODEL_TIMEOUT_SECONDS=15
 ```
 
-Base URL、模型名和 API Key 必须同时存在，否则自动回退到 mock。不要提交 `.env` 或 API Key。发布版的配置文件位置为 `%APPDATA%\CyberTown\.env`。
+Base URL、模型名和 API Key 必须同时存在，否则自动回退到 mock。不要提交 `.env` 或 API Key。发布版的配置文件位置为 `%APPDATA%\Breakroom\.env`。
 
-兼容变量名为 `LLM_BASE_URL`、`LLM_MODEL_ID` 和 `LLM_API_KEY`。本地日志位于 `%APPDATA%\CyberTown\Logs\CyberTown.log`，对话数据库位于 `%APPDATA%\CyberTown\Data\CyberTown.db`。
+兼容变量名为 `LLM_BASE_URL`、`LLM_MODEL_ID` 和 `LLM_API_KEY`。本地日志位于 `%APPDATA%\Breakroom\Logs\Breakroom.log`，对话数据库位于 `%APPDATA%\Breakroom\Data\Breakroom.db`。
 
 ## 验证改动
 
@@ -85,7 +87,7 @@ powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 `
 
 脚本会依次运行 Ruff、pytest、PyInstaller、Godot 导出和发布包冒烟测试，并生成：
 
-- `Release/CyberTown-v0.1.0-windows-x86_64/`
+- `Release/Breakroom-v0.1.0-windows-x86_64/`
 - 对应 ZIP 压缩包
 - `.sha256` 校验文件
 
@@ -108,7 +110,7 @@ powershell -ExecutionPolicy Bypass -File Build\BuildRelease.ps1 `
 
 - 8765 端口被占用时，关闭占用程序后重试启动。
 - 后端无法连接模型服务时会自动降级到 mock，游戏仍可继续运行。
-- 启动和对话日志位于 `%APPDATA%\CyberTown\Logs\CyberTown.log`；提交 Issue 时请附上复现步骤和相关日志片段，并先移除 API Key 等敏感信息。
+- 启动和对话日志位于 `%APPDATA%\Breakroom\Logs\Breakroom.log`；提交 Issue 时请附上复现步骤和相关日志片段，并先移除 API Key 等敏感信息。
 
 ## 参与开发
 

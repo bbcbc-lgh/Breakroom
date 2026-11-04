@@ -33,6 +33,6 @@ Source distributions and complete license texts are available from the
 Python Package Index package pages and their linked source repositories:
 https://pypi.org/
 
-The original Cyber Town placeholder pixel artwork and interface assets in
+The original Breakroom placeholder pixel artwork and interface assets in
 this prototype were created for this project and do not incorporate external
 art packs or third-party font files.

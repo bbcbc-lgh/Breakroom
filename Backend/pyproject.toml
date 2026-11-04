@@ -1,7 +1,7 @@
 [project]
-name = "cyber-town-backend"
+name = "breakroom-backend"
 version = "0.1.0"
-description = "Local FastAPI backend for the Cyber Town game prototype"
+description = "Local FastAPI backend for the Breakroom game prototype"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "aiosqlite>=0.21,<1",
@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cyber-town-backend = "src.main:run"
+breakroom-backend = "src.main:run"
 
 [dependency-groups]
 dev = [

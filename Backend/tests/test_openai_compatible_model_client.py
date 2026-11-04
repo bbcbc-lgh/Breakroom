@@ -166,10 +166,10 @@ async def test_timeout_logs_a_sanitized_failure_category(caplog) -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ReadTimeout("contains-private-diagnostic", request=request)
 
-    model_logger = logging.getLogger("CyberTown.Model")
+    model_logger = logging.getLogger("Breakroom.Model")
     model_logger.addHandler(caplog.handler)
     try:
-        with caplog.at_level(logging.INFO, logger="CyberTown.Model"):
+        with caplog.at_level(logging.INFO, logger="Breakroom.Model"):
             await _client(handler).generate(_context())
     finally:
         model_logger.removeHandler(caplog.handler)

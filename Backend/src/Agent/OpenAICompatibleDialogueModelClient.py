@@ -18,7 +18,7 @@ from src.Domain.Dialogue import (
     MemoryCandidate,
 )
 
-logger = logging.getLogger("CyberTown.Model")
+logger = logging.getLogger("Breakroom.Model")
 ModelText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 MemoryTerm = Annotated[ModelText, StringConstraints(max_length=30)]
 

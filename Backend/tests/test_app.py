@@ -127,7 +127,7 @@ def test_backend_entrypoint_uses_cli_content_before_creating_app(tmp_path) -> No
         )
     )
     environment = os.environ.copy()
-    environment["CYBER_TOWN_CONTENT_PATH"] = str(tmp_path / "missing.json")
+    environment["BREAKROOM_CONTENT_PATH"] = str(tmp_path / "missing.json")
 
     result = subprocess.run(
         [sys.executable, "-c", probe],

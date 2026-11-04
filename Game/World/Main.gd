@@ -20,14 +20,14 @@ const HEALTH_RETRY_LIMIT := 10
 
 func _ready() -> void:
 	if not ContentLoader.is_ready():
-		push_error("Cyber Town content failed to load: %s" % ContentLoader.last_error)
+		push_error("Breakroom content failed to load: %s" % ContentLoader.last_error)
 		return
 	_build_world()
 	_build_npcs()
 	_build_player()
 	_build_ui()
 	APIClient.check_health()
-	print("Cyber Town playable slice ready: %d NPCs, version %s" % [ContentLoader.get_enabled_profiles().size(), ContentLoader.content_version])
+	print("Breakroom playable slice ready: %d NPCs, version %s" % [ContentLoader.get_enabled_profiles().size(), ContentLoader.content_version])
 
 
 func _build_world() -> void:
@@ -98,7 +98,7 @@ func _build_ui() -> void:
 	health_poll_timer.autostart = true
 	health_poll_timer.timeout.connect(APIClient.check_health)
 	add_child(health_poll_timer)
-	if OS.get_environment("CYBER_TOWN_CAPTURE_KIND") != "":
+	if OS.get_environment("BREAKROOM_CAPTURE_KIND") != "":
 		var capture_script = load("res://Tests/CaptureMainState.gd")
 		var capture = capture_script.new()
 		add_child(capture)

@@ -322,7 +322,7 @@ async def test_short_context_uses_only_latest_turn_when_all_are_old(tmp_path: Pa
 
 
 async def test_incomplete_schema_marker_fails_startup(tmp_path: Path) -> None:
-    database_path = tmp_path / "CyberTown.db"
+    database_path = tmp_path / "Breakroom.db"
     connection = sqlite3.connect(database_path)
     connection.executescript(
         """
@@ -340,7 +340,7 @@ async def test_incomplete_schema_marker_fails_startup(tmp_path: Path) -> None:
 
 
 async def test_version_one_database_is_upgraded(tmp_path: Path) -> None:
-    database_path = tmp_path / "CyberTown.db"
+    database_path = tmp_path / "Breakroom.db"
     database = Database(database_path)
     async with database.connection() as connection:
         await connection.executescript(MIGRATION_1)
@@ -372,7 +372,7 @@ async def test_unexpected_error_keeps_request_id(tmp_path: Path, monkeypatch) ->
         raise RuntimeError("forced API failure")
 
     monkeypatch.setattr(app.state.npc_service, "list_profiles", fail_list)
-    logger = logging.getLogger("CyberTown")
+    logger = logging.getLogger("Breakroom")
     records: list[str] = []
 
     class CaptureHandler(logging.Handler):

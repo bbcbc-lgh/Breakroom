@@ -100,7 +100,7 @@ sequenceDiagram
 不为 Python namespace package 新增 `__init__.py`。
 
 ```text
-CyberTown/
+Breakroom/
 |-- README.md                       # 开发、验证和发布入口
 |-- Docs/
 |   |-- REQUIRE.md                  # 需求与 AC-01 至 AC-10
@@ -138,7 +138,7 @@ CyberTown/
 |-- Build/
 |   |-- BuildRelease.ps1            # 后端冻结、Godot 导出和组装
 |   |-- SmokeTest.ps1               # 发布包健康与启动冒烟
-|   |-- CyberTownBackend.spec       # PyInstaller 配置
+|   |-- BreakroomBackend.spec       # PyInstaller 配置
 |   |-- Packaging/                  # 用户说明和许可证
 |   `-- Work/                       # 临时构建目录，Git 忽略
 |-- Acceptance/                     # 验收探针、记录和截图

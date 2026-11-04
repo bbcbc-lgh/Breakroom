@@ -22,7 +22,7 @@ from src.Service.MemoryService import MemoryService
 from src.Service.NPCService import NPCService
 from src.Service.RelationshipService import RelationshipService
 
-logger = logging.getLogger("CyberTown.Dialogue")
+logger = logging.getLogger("Breakroom.Dialogue")
 
 
 class RequestIdConflictError(RuntimeError):

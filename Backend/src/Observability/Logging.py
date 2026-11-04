@@ -37,7 +37,7 @@ class JsonFormatter(logging.Formatter):
 
 
 def configure_logging(log_dir: Path | None = None) -> None:
-    logger = logging.getLogger("CyberTown")
+    logger = logging.getLogger("Breakroom")
     formatter = JsonFormatter()
     if not any(isinstance(handler, logging.StreamHandler) for handler in logger.handlers):
         handler = logging.StreamHandler()
@@ -45,7 +45,7 @@ def configure_logging(log_dir: Path | None = None) -> None:
         logger.addHandler(handler)
     if log_dir is not None:
         log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = (log_dir / "CyberTown.log").resolve()
+        log_path = (log_dir / "Breakroom.log").resolve()
         existing_files = {
             Path(handler.baseFilename).resolve()
             for handler in logger.handlers

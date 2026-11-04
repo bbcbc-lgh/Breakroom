@@ -38,7 +38,7 @@ from src.Service.MemoryService import MemoryService
 from src.Service.NPCService import NPCService
 from src.Service.RelationshipService import RelationshipService
 
-logger = logging.getLogger("CyberTown.API")
+logger = logging.getLogger("Breakroom.API")
 
 
 def _valid_port(value: str) -> int:
@@ -74,7 +74,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(
         title="赛博小镇后端服务",
-        description="Cyber Town local NPC dialogue backend",
+        description="Breakroom local NPC dialogue backend",
         version=APP_VERSION,
         lifespan=lifespan,
     )
@@ -139,7 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Cyber Town local backend")
+    parser = argparse.ArgumentParser(description="Breakroom local backend")
     parser.add_argument("--host")
     parser.add_argument("--port", type=_valid_port)
     parser.add_argument("--data-dir", type=Path)

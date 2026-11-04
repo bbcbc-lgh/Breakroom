@@ -4,16 +4,16 @@
 
 ## 1. 发布目标
 
-测试者解压后双击 `CyberTown.exe` 即可进入游戏，不需要安装 Godot、Python、Qdrant 或 Neo4j。默认 mock 模式无需 API 密钥。
+测试者解压后双击 `Breakroom.exe` 即可进入游戏，不需要安装 Godot、Python、Qdrant 或 Neo4j。默认 mock 模式无需 API 密钥。
 
 ## 2. 发布目录
 
 ```text
-CyberTown-v0.1.0-windows-x86_64/
-|-- CyberTown.exe
-|-- CyberTown.pck
+Breakroom-v0.1.0-windows-x86_64/
+|-- Breakroom.exe
+|-- Breakroom.pck
 |-- Backend/
-|   |-- CyberTownBackend.exe
+|   |-- BreakroomBackend.exe
 |   `-- _internal/...
 |-- Content/
 |   `-- NPCProfiles.json
@@ -30,8 +30,8 @@ CyberTown-v0.1.0-windows-x86_64/
 
 ```mermaid
 sequenceDiagram
-    participant G as CyberTown.exe
-    participant B as CyberTownBackend.exe
+    participant G as Breakroom.exe
+    participant B as BreakroomBackend.exe
     participant H as /health
 
     G->>H: 检查 127.0.0.1:8765
@@ -52,8 +52,8 @@ Godot 只在退出时终止自己创建且仍存活的后端 PID。若检测到�
 ## 4. 运行路径
 
 - 配置：发布目录 `Content/NPCProfiles.json`，用户可编辑。
-- SQLite：`%APPDATA%/CyberTown/Data/CyberTown.db`。
-- 日志：`%APPDATA%/CyberTown/Logs/`。
+- SQLite：`%APPDATA%/Breakroom/Data/Breakroom.db`。
+- 日志：`%APPDATA%/Breakroom/Logs/`。
 - 用户设置：Godot `user://Settings.cfg`。
 - 密钥：不写进发布目录；真实模型由用户自行创建本地 `.env` 或系统环境变量。
 
@@ -73,7 +73,7 @@ Godot 只在退出时终止自己创建且仍存活的后端 PID。若检测到�
 1. 检查 Git 工作区和版本号输入。
 2. 创建独立构建临时目录。
 3. 在受控 Python 环境运行后端测试。
-4. 使用 PyInstaller one-folder 构建 `CyberTownBackend.exe`。
+4. 使用 PyInstaller one-folder 构建 `BreakroomBackend.exe`。
 5. 对冻结后端运行健康检查冒烟测试。
 6. 使用已提交的 `export_presets.cfg` 导出 Godot Windows Release。
 7. 复制内容配置、README 和许可证。
@@ -89,7 +89,7 @@ Godot 导出需要 4.7.1 对应的 Windows export template。开发前置检查�
 
 ```powershell
 python -m src.main --dialogue-mode mock
-D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\CyberTown\Game
+D:\Godot\Godot_v4.7.1-stable_win64.exe --path E:\Breakroom\Game
 ```
 
 具体虚拟环境命令和 Python 支持版本在开发计划中锁定，并以实际依赖测试为准。

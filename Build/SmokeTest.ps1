@@ -7,8 +7,8 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $releaseRoot = [System.IO.Path]::GetFullPath($ReleaseDirectory)
-$backendExe = Join-Path $releaseRoot 'Backend\CyberTownBackend.exe'
-$gameExe = Join-Path $releaseRoot 'CyberTown.exe'
+$backendExe = Join-Path $releaseRoot 'Backend\BreakroomBackend.exe'
+$gameExe = Join-Path $releaseRoot 'Breakroom.exe'
 $contentPath = Join-Path $releaseRoot 'Content\NPCProfiles.json'
 
 foreach ($requiredPath in @($backendExe, $gameExe, $contentPath)) {
@@ -94,7 +94,7 @@ function Assert-ReleaseContents {
         $content = [System.IO.File]::ReadAllText($file.FullName)
         $keyAssignments = [regex]::Matches(
             $content,
-            '(?im)^\s*(LLM_API_KEY|CYBER_TOWN_MODEL_API_KEY)\s*=\s*([^\s#]+)'
+            '(?im)^\s*(LLM_API_KEY|BREAKROOM_MODEL_API_KEY)\s*=\s*([^\s#]+)'
         )
         foreach ($assignment in $keyAssignments) {
             $value = $assignment.Groups[2].Value
@@ -108,7 +108,7 @@ function Assert-ReleaseContents {
 Assert-ReleaseContents
 Assert-PortFree -TargetPort $Port
 
-$smokeRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("CyberTown-Smoke-" + [guid]::NewGuid())
+$smokeRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("Breakroom-Smoke-" + [guid]::NewGuid())
 $dataDir = Join-Path $smokeRoot 'Data'
 $appDataDir = Join-Path $smokeRoot 'AppData'
 $originalContent = [System.IO.File]::ReadAllText($contentPath)
@@ -116,10 +116,10 @@ New-Item -ItemType Directory -Path $dataDir, $appDataDir | Out-Null
 $previousPath = $env:PATH
 $previousAppData = $env:APPDATA
 $smokeEnvironmentNames = @(
-    'CYBER_TOWN_DIALOGUE_MODE',
-    'CYBER_TOWN_MODEL_BASE_URL',
-    'CYBER_TOWN_MODEL_NAME',
-    'CYBER_TOWN_MODEL_API_KEY',
+    'BREAKROOM_DIALOGUE_MODE',
+    'BREAKROOM_MODEL_BASE_URL',
+    'BREAKROOM_MODEL_NAME',
+    'BREAKROOM_MODEL_API_KEY',
     'LLM_BASE_URL',
     'LLM_MODEL_ID',
     'LLM_API_KEY'
@@ -130,7 +130,7 @@ foreach ($name in $smokeEnvironmentNames) {
     Remove-Item -Path "Env:$name" -ErrorAction SilentlyContinue
 }
 $env:APPDATA = $appDataDir
-$smokeLog = Join-Path $appDataDir 'CyberTown\Logs\CyberTown.log'
+$smokeLog = Join-Path $appDataDir 'Breakroom\Logs\Breakroom.log'
 
 try {
     $backend = Start-FrozenBackend -DataDirectory $dataDir -TargetPort $Port
@@ -152,7 +152,7 @@ try {
         }
     }
     finally {
-        Stop-OwnedProcess -Process $backend -ExpectedCommand 'CyberTownBackend.exe'
+        Stop-OwnedProcess -Process $backend -ExpectedCommand 'BreakroomBackend.exe'
     }
     Assert-PortFree -TargetPort $Port
 
@@ -186,7 +186,7 @@ try {
         if ($history.messages.Count -ne 4) { throw 'NPC history was not preserved after config restart.' }
     }
     finally {
-        Stop-OwnedProcess -Process $backend -ExpectedCommand 'CyberTownBackend.exe'
+        Stop-OwnedProcess -Process $backend -ExpectedCommand 'BreakroomBackend.exe'
     }
     Assert-PortFree -TargetPort $Port
 }
